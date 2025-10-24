@@ -48,39 +48,39 @@ const capitalAliases = {
 // 1. Data structure for easy mode
 const easyModeData = {
   Americas: [
-    { country: "Antigua and Barbuda", capital: "St Johns" },
+    { country: "Antigua and Barbuda", capital: "St. John's" },
+    { country: "Argentina", capital: "Buenos Aires" },
     { country: "Bahamas", capital: "Nassau" },
     { country: "Barbados", capital: "Bridgetown" },
     { country: "Belize", capital: "Belmopan" },
+    { country: "Bolivia", capital: "La Paz/Sucre" },
+    { country: "Brazil", capital: "Brasilia" },
     { country: "Canada", capital: "Ottawa" },
+    { country: "Chile", capital: "Santiago" },
+    { country: "Colombia", capital: "Bogota" },
     { country: "Costa Rica", capital: "San Jose" },
     { country: "Cuba", capital: "Havana" },
     { country: "Dominica", capital: "Roseau" },
     { country: "Dominican Republic", capital: "Santo Domingo" },
+    { country: "Ecuador", capital: "Quito" },
     { country: "El Salvador", capital: "San Salvador" },
-    { country: "Grenada", capital: "St Georges" },
+    { country: "Grenada", capital: "St. George's" },
     { country: "Guatemala", capital: "Guatemala City" },
+    { country: "Guyana", capital: "Georgetown" },
     { country: "Haiti", capital: "Port-au-Prince" },
     { country: "Honduras", capital: "Tegucigalpa/Comayaguela" },
     { country: "Jamaica", capital: "Kingston" },
     { country: "Mexico", capital: "Mexico City" },
     { country: "Nicaragua", capital: "Managua" },
     { country: "Panama", capital: "Panama City" },
+    { country: "Paraguay", capital: "Asuncion" },
+    { country: "Peru", capital: "Lima" },
     { country: "St. Kitts and Nevis", capital: "Basseterre" },
     { country: "St. Lucia", capital: "Castries" },
     { country: "St. Vincent and the Grenadines", capital: "Kingstown" },
+    { country: "Suriname", capital: "Paramaribo" },
     { country: "Trinidad and Tobago", capital: "Port of Spain" },
     { country: "United States", capital: "Washington, D.C." },
-    { country: "Argentina", capital: "Buenos Aires" },
-    { country: "Bolivia", capital: "La Paz/Sucre" },
-    { country: "Brazil", capital: "Brasilia" },
-    { country: "Chile", capital: "Santiago" },
-    { country: "Colombia", capital: "Bogota" },
-    { country: "Ecuador", capital: "Quito" },
-    { country: "Guyana", capital: "Georgetown" },
-    { country: "Paraguay", capital: "Asuncion" },
-    { country: "Peru", capital: "Lima" },
-    { country: "Suriname", capital: "Paramaribo" },
     { country: "Uruguay", capital: "Montevideo" },
     { country: "Venezuela", capital: "Caracas" }
   ],
@@ -907,5 +907,5 @@ function handleCapitalGuess(rawInput) {
 }
 
 function normalize(str) {
-  return str.toLowerCase(); 
+  return str.toLowerCase();
 }
