@@ -1,0 +1,82 @@
+/* General page styling */
+body {
+    font-family: 'JetBrains Mono', monospace;
+    text-align: center;
+    background-color: #a40000;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+/* Bars (cover the whole viewport horizontally, stacked vertically) */
+.menu-bar {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    /* slightly exceed to prevent horizontal gaps */
+    height: calc(100% / 5px);
+    /* ensures slight overlap to remove visible seams */
+    background: #a40000;
+    top: calc((var(--i) - 1) * 20%);
+    z-index: 30;
+    flex-direction: row;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    /* space between buttons */
+}
+
+/* Shared button styling */
+.quiz-button {
+    display: inline-block;
+    padding: 15px 25px;
+    background-color: #d9534f;
+    color: white;
+    text-decoration: none;
+    font-size: 1.5rem;
+    border-radius: 8px;
+    transition: background 0.2s ease, transform 0.2s ease;
+    width: 250px;
+    text-align: center;
+    position: relative;
+    user-select: none;
+    cursor: pointer;
+    margin: 120px;
+    height: 62px;
+}
+
+/* Hover + focus style used by the real button */
+.quiz-button:hover {
+    background-color: #c9302c;
+    transform: scale(1.05);
+}
+
+/* Active (pressed) */
+.quiz-button:active {
+    transform: scale(0.98);
+}
+
+/* Headings */
+p {
+    font-size: 18px;
+}
+
+.menu-bar h1 {
+    font-size: 4rem;
+    margin: 120px;
+    /* remove default margin */
+    text-align: left;
+}
+
+/* Fade in */
+#fade-container {
+  opacity: 0;                 /* start invisible */
+  transition: opacity 2s ease; /* fade-in over 2s */
+}
+#fade-container.visible {
+  opacity: 1;
+}
