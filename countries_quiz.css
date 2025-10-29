@@ -10,7 +10,7 @@ body {
   width: 100%;
   min-height: 100%;
   font-family: 'JetBrains Mono', monospace;
-  background: #a40000;
+  background: #2b2a33;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -69,7 +69,7 @@ input#answer {
 }
 
 #timer.win {
-  color: rgb(0, 0, 0);
+  color: green;
 }
 
 #timer.giveup {
@@ -95,8 +95,8 @@ input#answer {
 
 /* --- Fixed-size map --- */
 #map-container {
-  width: 500px;          /* fixed width */
-  aspect-ratio: 3 / 2;   /* ✅ locks height relative to width */
+  width: 100%;          /* fixed width */
+     
   display: flex;
   justify-content: center;
   align-items: center;
@@ -316,7 +316,7 @@ input#answer {
   fill-opacity: 1;
   stroke: white;
   /* same color as hover */
-  stroke-width: 0.5px;
+  stroke-width: 0.01rem;
   stroke-opacity: 1;
   /* match hover stroke */
   vector-effect: non-scaling-stroke;
@@ -346,104 +346,128 @@ input#answer {
   margin-top: 0px;
 }
 
-/* Fullscreen pregame overlay */
-.pregame-overlay {
+/* Fullscreen overlay */
+#pregame-overlay {
   position: fixed;
   inset: 0;
-  background: #00000000;
+  background: #2b2a33;
+  color: white;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  overflow: hidden;
-  color: white;
-  font-family: 'JetBrains Mono', monospace;
+  opacity: 1;
+  transition: opacity 1s ease; /* dissolve animation */
 }
 
-/* Bars (cover the whole viewport horizontally, stacked vertically) */
-.pregame-bar {
-  position: absolute;
-  left: 0;
-  width: 101%;
-  /* slightly exceed to prevent horizontal gaps */
-  height: calc(100% / 5 + 1px);
-  /* ensures slight overlap to remove visible seams */
-  background: #a40000;
-  top: calc((var(--i) - 1) * 20%);
-  z-index: 30;
-  transform: translateX(0);
-  transition: transform 0.65s cubic-bezier(.2, .9, .2, 1), opacity 0.35s ease;
-  transition-delay: calc((var(--i) - 1) * 0.12s);
-  display: flex;
+/* Default: hidden */
+.pregame-overlay h2,
+.pregame-overlay p,
+#pregame-back-btn,
+#pregame-overlay button {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 2s ease, transform 2s ease;
+}
 
-  justify-content: center;
-  flex-direction: column;
-  font-family: inherit;
+#pregame-overlay.exit {
+  opacity: 0;
+  pointer-events: none; /* disable interactions after fade */
+}
+
+
+
+/* Pregame content */
+.overlay-content {
+  position: absolute;      /* position it relative to viewport */
+  top: 30vh;               /* adjust vertical placement */
+  left: 10vw;              /* adjust horizontal placement */
+  width: 80vw;             /* fixed width */
+  height: 20vh;            /* fixed height */
+  text-align: left;        /* keep text left-aligned */
+  display: flex;           /* optional: use flex to align content inside */
+  flex-direction: column;  /* stack h2, p, etc. vertically */
+  justify-content: center; /* vertically center text inside container */
+}
+
+#pregame-overlay h2 {
+  font-size: 3rem;
+  margin-bottom: 10vh;
+  opacity: 0;
+}
+
+#pregame-overlay p {
+  font-size: 2rem;
+  margin-bottom: 10vh;
+  opacity: 0;
+}
+
+#start-game-btn {
+  padding: 12px 24px;
+  font-size: 1.5rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  font-family: 'JetBrains Mono', monospace;
+  width: 200px;
+}
+
+#start-game-btn:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+#start-game-btn:active {
+  transform: scale(0.98);
 }
 
 #game-title {
   opacity: 0;
   /* hidden until transition completes */
   transition: none;
-  top: 120px;
+  top: 10vh;
   font-size: 3rem;
 }
 
-#back-home-btn {
-  position: absolute;
-  top: 120px;  /* starting lower */
-  left: 120px;
-  color: white;
-  text-decoration: none;
-  font-size: 4rem;
-  z-index: 999999;
+#pregame-back-btn {
   opacity: 0;
-  transition: opacity 1s ease, transform 0.2s ease;
-}
-
-#back-home-btn:hover {
-  transform: scale(1.05);
+  transition: opacity 2s ease;
 }
 
 /* Fade in */
-body.show-back-btn #back-home-btn {
+body.show-back-btn #back-home-btn,
+body.show-back-btn #pregame-back-btn {
   opacity: 1;
 }
 
 /* Slide up */
 body.game-started #back-home-btn {
   transition: top 0.8s ease;
-  top: 20px; /* moves up to align with #game-title */
+  top: 1vh; /* moves up to align with #game-title */
 }
 
+
+
 #pregame-title {
-  position: absolute;
+  position: fixed;
   font-size: 4rem;
-  top: 120px;
-  left: 240px;
+  top: 10vh;
+  left: 12vw;
   color: white;
   z-index: 50;
   /* remove default margin */
   text-align: left;
   opacity: 0;
-  transition: opacity 2s, transform 0.8s cubic-bezier(.2, .9, .2, 1),
-    font-size 0.8s cubic-bezier(.2, .9, .2, 1);
+  transition: opacity 2s ease, transform 0.8s ease,
+    font-size 0.8s ease;
   transform-origin: top left;
+  margin-bottom: 0px;
 }
 
-.pregame-bar h2 {
-  font-size: 3rem;
-  margin: 120px;
-  /* remove default margin */
-  text-align: left;
-}
-
-.pregame-bar p {
-  font-size: 2rem;
-  margin: 120px;
-  /* remove default margin */
-  text-align: left;
-}
 
 /* Content sits above bars visually */
 .popup-content.pregame {
@@ -458,61 +482,101 @@ body.game-started #back-home-btn {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-/* Button styling inside pregame bar */
-.pregame-bar button {
-  padding: 10px 18px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  background: #4caf50;
-  color: white;
-  font-weight: 600;
-  font-family: inherit;
-  font-size: 1.5rem;
-  opacity: 0;
-  transition: opacity 2s ease, background 0.2s ease, transform 0.2s ease;
-  width: 200px;
-  height: 75px;
-  margin: 120px;
-}
-
-.pregame-bar button:hover {
-  background: #45a049;
-  transform: scale(1.05);
-}
-
-.pregame-bar button:active {
-  transform: scale(0.98);
-}
-
-/* EXIT state: move bars off to the right */
-.pregame-overlay.exit .pregame-bar {
-  transform: translateX(100%);
-  opacity: 0.98;
-}
-
 /* Accessibility: disable animation for reduced motion */
 @media (prefers-reduced-motion: reduce) {
 
-  .pregame-bar,
   .popup-content.pregame {
     transition: none !important;
   }
 }
 
-/* Initial state: fully transparent */
-.pregame-bar h2,
-.pregame-bar p,
-#back-home-btn {
-  opacity: 0;
-  transition: opacity 2s ease;
-}
-
 /* Fade in state */
-.pregame-overlay.show #pregame-title,
-.pregame-overlay.show .pregame-bar h2,
-.pregame-overlay.show .pregame-bar p,
-.pregame-overlay.show .pregame-bar button,
-back-home-btn {
+.pregame-overlay.show #pregame-title {
   opacity: 1;
 }
+
+/* Sticky header for title, input, and score */
+#game-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #2b2a33;
+  z-index: 999;
+  display: flex;
+  flex-direction: column; /* keep the stacked layout */
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+/* Push down rest of content to avoid overlap */
+body {
+  padding-top: 180px; /* adjust depending on header height */
+}
+
+/* Optional: make the header a bit translucent when scrolling */
+#game-header.scrolled {
+  background: rgba(43, 42, 51, 0.9);
+  backdrop-filter: blur(6px);
+  transition: background 0.3s ease;
+}
+
+/* Make back button stick inside the header */
+#back-home-btn {
+  position: absolute;
+  top: 10vh;
+  left: 6vw;
+  font-size: 4rem;
+  color: white;
+  text-decoration: none;
+  z-index: 1001;
+  transition: transform 0.2s ease, opacity 1s ease;
+}
+
+#back-home-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Home button (top-left corner) */
+#pregame-back-btn {
+  position: fixed; /* fix it relative to viewport */
+  top: 10vh;
+  left: 6vw;
+  font-size: 4rem;
+  text-decoration: none;
+  color: white;
+  z-index: 9999; /* above everything */
+  opacity: 0; /* hidden initially */
+  transition: opacity 2s ease; /* smooth fade in */
+  pointer-events: auto; /* make it clickable */
+}
+
+/* Instantly disappear when game starts */
+body.game-started #pregame-back-btn {
+  opacity: 0;      /* hidden immediately */
+  transition: none; /* disable fade */
+}
+
+#pregame-back-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Make pregame back button fade in along with overlay */
+#pregame-back-btn {
+  opacity: 0;
+  transition: opacity 2s ease, transform 0.2s ease;
+}
+
+#pregame-overlay.show #pregame-back-btn,
+#pregame-overlay.show h2,
+#pregame-overlay.show p,
+#pregame-overlay.show button {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+
+

@@ -111,115 +111,167 @@ const svg = document.getElementById('world-map-svg');
 const guessed = new Set();
 score.textContent = `Countries Named:   0/${countries.length}`;
 
-// --- ZOOM + PAN FEATURE ---
-let zoomedIn = false;
-let originalViewBox = svg.getAttribute("viewBox");
+/* // --- ZOOM + PAN FEATURE (Buffered Scroll + Auto-Center + Bounds Lock) ---
+
+let baseViewBox = svg.getAttribute("viewBox").split(" ").map(Number);
+let currentViewBox = [...baseViewBox];
+
+let zoomLevel = 1; // 1 = 100%
+const minZoom = 1;
+const maxZoom = 8;
+let targetZoom = zoomLevel; // For buffered zooming
+let zoomBuffer = 0; // Store scroll input
+
+let isAnimating = false;
 let isPanning = false;
 let startPoint = { x: 0, y: 0 };
-let startViewBox = originalViewBox.split(" ").map(Number);
-let dragThreshold = 3; // pixels
+let startViewBox = [...baseViewBox];
+let dragThreshold = 3;
 let dragged = false;
-let isAnimating = false; // 🔒 Prevent spam-clicking during zoom animation
 
+svg.style.cursor = "default";
+
+// --- Helper: Clamp panning so map never goes out of bounds ---
+function clampViewBox(vb) {
+  const [x, y, w, h] = vb;
+  const [bx, by, bw, bh] = baseViewBox;
+
+  // Limit boundaries — prevent showing outside base map
+  let clampedX = Math.min(Math.max(x, bx), bx + bw - w);
+  let clampedY = Math.min(Math.max(y, by), by + bh - h);
+
+  return [clampedX, clampedY, w, h];
+}
+
+// --- PANNING ---
 svg.addEventListener("mousedown", (e) => {
-  if (!zoomedIn || isAnimating) return; // Only pan when zoomed in & not animating
+  if (zoomLevel === 1 || isAnimating) return;
   isPanning = true;
   dragged = false;
   startPoint = { x: e.clientX, y: e.clientY };
   startViewBox = svg.getAttribute("viewBox").split(" ").map(Number);
-
   svg.style.cursor = "grabbing";
 });
 
 svg.addEventListener("mousemove", (e) => {
-  if (!isPanning || !zoomedIn || isAnimating) return;
+  if (!isPanning || zoomLevel === 1 || isAnimating) return;
 
   const dx = e.clientX - startPoint.x;
   const dy = e.clientY - startPoint.y;
 
-  if (Math.abs(dx) > dragThreshold || Math.abs(dy) > dragThreshold) {
-    dragged = true;
-  }
+  if (Math.abs(dx) > dragThreshold || Math.abs(dy) > dragThreshold) dragged = true;
 
   const rect = svg.getBoundingClientRect();
   const scaleX = startViewBox[2] / rect.width;
   const scaleY = startViewBox[3] / rect.height;
 
-  const newX = startViewBox[0] - dx * scaleX;
-  const newY = startViewBox[1] - dy * scaleY;
+  let newX = startViewBox[0] - dx * scaleX;
+  let newY = startViewBox[1] - dy * scaleY;
 
-  svg.setAttribute("viewBox", `${newX} ${newY} ${startViewBox[2]} ${startViewBox[3]}`);
+  const clamped = clampViewBox([newX, newY, startViewBox[2], startViewBox[3]]);
+  svg.setAttribute("viewBox", clamped.join(" "));
+  currentViewBox = clamped;
 });
 
-svg.addEventListener("mouseup", () => {
-  isPanning = false;
-  svg.style.cursor = zoomedIn ? "grab" : "default";
+["mouseup", "mouseleave"].forEach(evt => {
+  svg.addEventListener(evt, () => {
+    isPanning = false;
+    svg.style.cursor = zoomLevel > 1 ? "grab" : "default";
+  });
 });
 
-svg.addEventListener("mouseleave", () => {
-  isPanning = false;
-  svg.style.cursor = zoomedIn ? "grab" : "default";
-});
+// --- BUFFERED SCROLL ZOOM ---
+let lastWheelTime = 0;
 
-svg.addEventListener("click", (e) => {
-  if (dragged || isAnimating) return; // 🚫 Ignore drags or spam clicks
-  isAnimating = true; // 🔒 Lock until animation completes
+svg.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  const now = Date.now();
+
+  // Combine rapid scrolls into one smooth animation
+  if (now - lastWheelTime < 200) {
+    zoomBuffer += e.deltaY;
+  } else {
+    zoomBuffer = e.deltaY;
+  }
+  lastWheelTime = now;
+
+  if (!isAnimating) processZoomBuffer(e);
+}, { passive: false });
+
+function processZoomBuffer(e) {
+  if (zoomBuffer === 0) return;
+
+  const delta = zoomBuffer;
+  zoomBuffer = 0;
+
+  const zoomDirection = delta < 0 ? 1 : -1;
+  const zoomFactor = zoomDirection > 0 ? 1.5 : 1 / 1.5;
+
+  targetZoom = Math.min(maxZoom, Math.max(minZoom, zoomLevel * zoomFactor));
+  if (targetZoom === zoomLevel) return;
+
+  isAnimating = true;
 
   const rect = svg.getBoundingClientRect();
-
-  // Determine target viewBox
-  let targetViewBox;
-  if (!zoomedIn) {
-    const x = ((e.clientX - rect.left) / rect.width) * 1009.6727;
-    const y = ((e.clientY - rect.top) / rect.height) * 665.96301;
-
-    const zoomWidth = 1009.6727 / 10;
-    const zoomHeight = 665.96301 / 10;
-
-    const viewBoxX = x - zoomWidth / 2;
-    const viewBoxY = y - zoomHeight / 2;
-
-    targetViewBox = [viewBoxX, viewBoxY, zoomWidth, zoomHeight];
-  } else {
-    targetViewBox = originalViewBox.split(" ").map(Number);
-  }
+  // Mouse coords relative to current viewBox, not base
+  const [curX, curY, curW, curH] = currentViewBox;
+  const mouseX = curX + ((e.clientX - rect.left) / rect.width) * curW;
+  const mouseY = curY + ((e.clientY - rect.top) / rect.height) * curH;
 
   const startViewBox = svg.getAttribute("viewBox").split(" ").map(Number);
-  const duration = 500; // ms
+  let targetViewBox;
+
+  if (targetZoom === minZoom) {
+    // Zooming out fully → reset to centered base view
+    targetViewBox = [...baseViewBox];
+  } else {
+    const targetWidth = baseViewBox[2] / targetZoom;
+    const targetHeight = baseViewBox[3] / targetZoom;
+
+    const scale = zoomLevel / targetZoom;
+    const targetX = mouseX - (mouseX - startViewBox[0]) * scale;
+    const targetY = mouseY - (mouseY - startViewBox[1]) * scale;
+
+    targetViewBox = [targetX, targetY, targetWidth, targetHeight];
+  }
+
+  // Clamp before animating
+  targetViewBox = clampViewBox(targetViewBox);
+
+  const duration = 400;
   const startTime = performance.now();
 
-  const targetFPS = 120;
-  const frameDuration = 1000 / targetFPS;
-  let lastFrameTime = 0;
-
   function animateZoom(now) {
-    const elapsed = now - startTime;
-    const t = Math.min(elapsed / duration, 1);
+    const t = Math.min((now - startTime) / duration, 1);
+    const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-    if (now - lastFrameTime >= frameDuration) {
-      lastFrameTime = now;
+    const interpolated = startViewBox.map((start, i) =>
+      start + (targetViewBox[i] - start) * ease
+    );
 
-      const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-
-      const currentViewBox = startViewBox.map((startVal, i) =>
-        startVal + (targetViewBox[i] - startVal) * ease
-      );
-
-      svg.setAttribute("viewBox", currentViewBox.join(" "));
-    }
+    const clamped = clampViewBox(interpolated);
+    svg.setAttribute("viewBox", clamped.join(" "));
+    currentViewBox = clamped;
 
     if (t < 1) {
       requestAnimationFrame(animateZoom);
     } else {
-      zoomedIn = !zoomedIn;
-      isAnimating = false; // ✅ Unlock after animation completes
-      svg.style.cursor = zoomedIn ? "grab" : "default";
+      zoomLevel = targetZoom;
+      currentViewBox = clampViewBox(targetViewBox);
+      isAnimating = false;
+      svg.style.cursor = zoomLevel > 1 ? "grab" : "default";
+
+      // Continue animating if more scroll buffered mid-animation
+      if (zoomBuffer !== 0) processZoomBuffer(e);
     }
   }
 
   requestAnimationFrame(animateZoom);
-});
-// --- END ZOOM + PAN FEATURE ---
+}
+// --- END ZOOM + PAN FEATURE --- */
+
+
+
 
 
 
@@ -390,6 +442,7 @@ if (giveUpButton) {
 
 // PREGAME POPUP
 const pregameOverlay = document.getElementById('pregame-overlay');
+const pregameBackBtn = document.getElementById('pregame-back-btn');
 const startBtn = document.getElementById('start-game-btn');
 const answerInput = document.getElementById('answer');
 
@@ -434,8 +487,8 @@ if (startBtn && pregameOverlay) {
     // Allow scrolling again
     document.body.style.overflow = '';
     document.documentElement.style.overflow = '';
-
-    // Recalculate bounding boxes *after* layout settles
+    gameTitle.style.opacity = '1';
+    /* // Recalculate bounding boxes *after* layout settles
     const preRect = pregameTitle.getBoundingClientRect();
     const gameRect = gameTitle.getBoundingClientRect();
 
@@ -443,20 +496,18 @@ if (startBtn && pregameOverlay) {
     const translateY = gameRect.top - preRect.top;
     const scale = gameRect.width / preRect.width;
 
-    console.log("Recalculated translation:", translateX, translateY, scale);
+    console.log("Recalculated translation:", translateX, translateY, scale); */
 
-    // Start the animation
-    pregameTitle.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    /* // Start the animation
+    pregameTitle.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`; */
 
     // Fade transition
-    setTimeout(() => {
-      pregameTitle.style.opacity = '0';
-      gameTitle.style.opacity = '1';
-    }, 800);
+    
 
     // Overlay exit animation
     pregameOverlay.classList.add('exit');
     document.body.classList.add('game-started');
+    pregameBackBtn.style.display = 'none'; // immediately removes it from layout
 
     const totalMs = Math.ceil((0.65 + (5 - 1) * 0.12) * 1000 + 80);
 
@@ -842,3 +893,30 @@ function setTimerColor(state) {
     timerElement.classList.add('giveup');
   }
 }
+
+// --- ZOOM + PAN (Panzoom Integration) ---
+document.addEventListener("DOMContentLoaded", () => {
+  const svg = document.getElementById("world-map-svg");
+
+  // Initialize Panzoom on the SVG
+  const panzoom = Panzoom(svg, {
+    maxScale: 30,          // Maximum 8x zoom
+    minScale: 1,          // Default 1x (no zoom)
+    contain: 'outside',   // Prevent panning outside bounds
+    smoothScroll: false,  // Disable scroll inertia
+    step: 0.5,            // Smoothness of wheel zoom increments
+  });
+
+  // Enable wheel zoom (scroll zoom)
+  svg.parentElement.addEventListener("wheel", panzoom.zoomWithWheel);
+
+  // Optional: change cursor dynamically for better UX
+  svg.style.cursor = "grab";
+  svg.addEventListener("mousedown", () => (svg.style.cursor = "grabbing"));
+  svg.addEventListener("mouseup", () => (svg.style.cursor = "grab"));
+
+  // Optional: reset zoom with double click
+  svg.addEventListener("dblclick", () => {
+    panzoom.reset({ animate: true });
+  });
+});

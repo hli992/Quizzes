@@ -2,7 +2,7 @@
 body {
     font-family: 'JetBrains Mono', monospace;
     text-align: center;
-    background-color: #a40000;
+    background-color: #2b2a33;
     margin: 0;
     height: 100vh;
     display: flex;
@@ -19,7 +19,7 @@ body {
     /* slightly exceed to prevent horizontal gaps */
     height: calc(100% / 5px);
     /* ensures slight overlap to remove visible seams */
-    background: #a40000;
+    background: #2b2a33;
     top: calc((var(--i) - 1) * 20%);
     z-index: 30;
     flex-direction: row;
@@ -34,24 +34,24 @@ body {
 .quiz-button {
     display: inline-block;
     padding: 15px 25px;
-    background-color: #d9534f;
+    background-color: #4caf50;
     color: white;
     text-decoration: none;
     font-size: 1.5rem;
     border-radius: 8px;
     transition: background 0.2s ease, transform 0.2s ease;
     width: 250px;
-    text-align: center;
+    text-align: left;
     position: relative;
     user-select: none;
     cursor: pointer;
-    margin: 120px;
+    margin: 10vh;
     height: 62px;
 }
 
 /* Hover + focus style used by the real button */
 .quiz-button:hover {
-    background-color: #c9302c;
+    background-color: #45a049;
     transform: scale(1.05);
 }
 
@@ -62,21 +62,61 @@ body {
 
 /* Headings */
 p {
-    font-size: 18px;
+    font-size: 2rem;
+    margin-bottom: 10vh;
 }
 
-.menu-bar h1 {
+#menu-title {
     font-size: 4rem;
-    margin: 120px;
+    
     /* remove default margin */
-    text-align: left;
+    text-align: center;
 }
+
+
 
 /* Fade in */
 #fade-container {
-  opacity: 0;                 /* start invisible */
-  transition: opacity 2s ease; /* fade-in over 2s */
+    opacity: 0;
+    /* start invisible */
+    transition: opacity 2s ease;
+    /* fade-in over 2s */
 }
+
 #fade-container.visible {
-  opacity: 1;
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .menu-bar {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        top: 0;
+        height: auto;
+        position: relative;
+        padding: 20px 0;
+    }
+
+    .menu-bar[style*="--i:1"] {
+        height: 12%;
+        /* make this smaller than the others */
+    }
+
+    .quiz-button {
+        margin: 10px 0;
+        width: 70%;
+        max-width: 300px;
+        font-size: 1.5rem;
+    }
+
+    .menu-bar h1 {
+        font-size: 2.2rem;
+        /* smaller title on mobile */
+        text-align: center;
+        /* center the text */
+        margin: 0px 0;
+        /* reduce top/bottom margin */
+    }
 }

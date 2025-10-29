@@ -41,14 +41,16 @@ const capitalAliases = {
   "Mexico": "Mexico City",
   "Panama": "Panama City",
   "Kuwait": "Kuwait City",
-  "Vatican": "Vatican City"
+  "Vatican": "Vatican City",
+  "Kiev": "Kyiv",
+  "Thimpu": "Thimphu"
   // add more as needed
 };
 
 // 1. Data structure for easy mode
 const easyModeData = {
   Americas: [
-    { country: "Antigua and Barbuda", capital: "St. John's" },
+    { country: "Antigua and Barbuda", capital: "St Johns" },
     { country: "Argentina", capital: "Buenos Aires" },
     { country: "Bahamas", capital: "Nassau" },
     { country: "Barbados", capital: "Bridgetown" },
@@ -64,7 +66,7 @@ const easyModeData = {
     { country: "Dominican Republic", capital: "Santo Domingo" },
     { country: "Ecuador", capital: "Quito" },
     { country: "El Salvador", capital: "San Salvador" },
-    { country: "Grenada", capital: "St. George's" },
+    { country: "Grenada", capital: "St Georges" },
     { country: "Guatemala", capital: "Guatemala City" },
     { country: "Guyana", capital: "Georgetown" },
     { country: "Haiti", capital: "Port-au-Prince" },
@@ -234,7 +236,7 @@ const easyModeData = {
     { country: "Tunisia", capital: "Tunis" },
     { country: "Uganda", capital: "Kampala" },
     { country: "Zambia", capital: "Lusaka" },
-    { country: "Zimbabwe", capital: "Harere" }
+    { country: "Zimbabwe", capital: "Harare" }
   ],
   Oceania: [
     { country: "Australia", capital: "Canberra" },
@@ -258,7 +260,7 @@ const easyModeData = {
 window.guessed = new Set();
 window.totalCapitals = 0;
 let input;
-let giveUpButton;
+let giveUpButton = document.getElementById('giveUpButton');;
 
 // Create a lookup for capitals and their aliases
 const inputToCapital = {};
@@ -276,7 +278,17 @@ for (const alias in capitalAliases) {
 }
 
 // ==== DOMCONTENTLOADED ====
+
+let seconds = 0;
+let timerInterval = null;
+let timerElement = null; // declare globally
+
 document.addEventListener('DOMContentLoaded', () => {
+  
+  timerElement = document.getElementById('timer');
+  startTimer();
+  updateTimerDisplay();
+  
   const tablesContainer = document.getElementById('continent-tables');
   input = document.getElementById('answer');
 
@@ -340,28 +352,7 @@ if (giveUpButton) {
   });
 }
 
-/* // ==== PREGAME OVERLAY ====
-  const pregameOverlay = document.getElementById('pregame-overlay');
-  const startBtn = document.getElementById('start-game-btn');
 
-  if (startBtn && pregameOverlay) {
-    startBtn.addEventListener('click', () => {
-      input.focus();
-
-      // trigger overlay exit animation
-      pregameOverlay.classList.add('exit');
-      document.body.classList.add('game-started');
-
-      // hide overlay after animation
-      const totalMs = Math.ceil((0.65 + (5 - 1) * 0.12) * 1000 + 80);
-      setTimeout(() => {
-        pregameOverlay.style.display = 'none';
-        startTimer();
-        input.focus();
-      }, totalMs);
-    });
-  }
- */
 
 // Updated populateCapitalTables function to accept container
 function populateCapitalTables(container) {
@@ -402,13 +393,9 @@ function populateCapitalTables(container) {
 }
 
 
-// TIMER
-const timerElement = document.getElementById('timer');
-let seconds = 0;
-let timerInterval = null;
 
-/* // GIVE UP BUTTON
-const giveUpButton = document.getElementById('giveUpButton');
+
+
 let giveUpConfirm = false;
 
 if (giveUpButton) {
@@ -456,7 +443,7 @@ if (giveUpButton) {
   });
 } else {
   console.warn('Give Up button not found - please add <button id="giveUpButton">Give Up</button> next to the timer.');
-} */
+} 
 
 // PREGAME POPUP
 const pregameOverlay = document.getElementById('pregame-overlay');
@@ -504,8 +491,8 @@ if (startBtn && pregameOverlay) {
     // Allow scrolling again
     document.body.style.overflow = '';
     document.documentElement.style.overflow = '';
-
-    // Recalculate bounding boxes *after* layout settles
+    gameTitle.style.opacity = '1';
+    /* // Recalculate bounding boxes *after* layout settles
     const preRect = pregameTitle.getBoundingClientRect();
     const gameRect = gameTitle.getBoundingClientRect();
 
@@ -521,12 +508,13 @@ if (startBtn && pregameOverlay) {
     // Fade transition
     setTimeout(() => {
       pregameTitle.style.opacity = '0';
-      gameTitle.style.opacity = '1';
-    }, 800);
+      
+    }, 800); */
 
     // Overlay exit animation
     pregameOverlay.classList.add('exit');
     document.body.classList.add('game-started');
+    
 
     const totalMs = Math.ceil((0.65 + (5 - 1) * 0.12) * 1000 + 80);
 
@@ -816,8 +804,6 @@ function resetGame() {
   // 7. Reset any popups
   if (typeof resetWinPopup === 'function') resetWinPopup();
 
-  // 8. Reset any map/zoom state if needed
-  if (typeof resetMapView === 'function') resetMapView();
 }
 
 
