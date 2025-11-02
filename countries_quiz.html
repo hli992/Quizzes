@@ -18,40 +18,41 @@
 
 
 
-<!-- PREGAME OVERLAY -->
-<div id="pregame-overlay" class="pregame-overlay">
+  <!-- PREGAME OVERLAY -->
+  <div id="pregame-overlay" class="pregame-overlay">
 
-  <!-- Home button (top-left corner) -->
-  <a href="quiz_homepage.html" id="pregame-back-btn">←</a>
+    <!-- Home button (top-left corner) -->
+    <a href="quiz_homepage.html" id="pregame-back-btn">←</a>
 
-  <div class="overlay-content">
-    <h1 id="pregame-title">Countries of the World</h1>
-    <h2>How to Play</h2>
-    <p>Scroll on the map to zoom, type in countries in the box, as fast as you can</p>
-    <button id="start-game-btn">I'm ready!</button>
-  </div>
-
-</div>
-
-
-
-    <!-- 
-    <div id="pre-game-popup" class="popup-content pregame">
+    <div class="overlay-content">
+      <h1 id="pregame-title">Countries of the World</h1>
       <h2>How to Play</h2>
-      <p>Click on the map to zoom, type in countries in the box, and try to name them as fast as you can!</p>
+      <p>Scroll on the map to zoom, type in countries in the box, as fast as you can</p>
       <button id="start-game-btn">I'm ready!</button>
-    </div> -->
+    </div>
+
   </div>
+
+
+
+
 
 
 
   <div id="game-header">
     <a href="quiz_homepage.html" id="back-home-btn">←</a>
     <h1 id="game-title">Countries of the World</h1>
+
     <div id="input-container">
+      <div id="map-tooltip-container">
+        <span id="map-tooltip-icon">?</span>
+        <div id="map-tooltip-text">Scroll to zoom<br />Click + drag to pan<br />Double click to reset</div>
+      </div>
       <input type="text" id="answer" placeholder="Type a country name">
       <span id="timer">00:00</span>
       <button id="giveUpButton">Give Up</button>
+      
+      <!-- TESTING ONLY: Remove this before publishing -->
       <!-- <button id="win">Win</button> -->
     </div>
     <div id="score"></div>
@@ -947,8 +948,9 @@
             title="Zimbabwe" id="ZW" class="land" />
         </g>
       </svg>
+
     </div>
-    <!-- <div id="results"></div> -->
+
     <div id="continent-tables"></div>
   </div>
   <div id="tooltip"></div>

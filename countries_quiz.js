@@ -502,7 +502,7 @@ if (startBtn && pregameOverlay) {
     pregameTitle.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`; */
 
     // Fade transition
-    
+
 
     // Overlay exit animation
     pregameOverlay.classList.add('exit');
@@ -705,8 +705,15 @@ function triggerWinCondition() {
   const popup = document.getElementById('win-popup');
   const msg = document.getElementById('win-message');
 
+  // Calculate countries per minute
+  const totalMinutes = seconds / 60 || 1; // avoid divide by zero
+  const rate = Math.round(countries.length / totalMinutes);
+
   // Update popup text
-  msg.textContent = `You named all ${countries.length} countries in ${mins}m ${secs}s!`;
+  msg.innerHTML = `
+    You named all ${countries.length} countries in ${mins}m ${secs}s!<br>
+    That's ${rate} countries per minute!
+  `;
 
   // Make popup visible
   popup.classList.remove('hidden');

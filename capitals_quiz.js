@@ -256,11 +256,24 @@ const easyModeData = {
   ]
 };
 
+// Flatten all regions into a single array
+let allCountries = Object.values(easyModeData).flat().map(c => ({
+  ...c,
+  guessed: false
+}));
+
+let currentCountry = null;
+
 // ==== GLOBAL GAME STATE ====
 window.guessed = new Set();
 window.totalCapitals = 0;
 let input;
 let giveUpButton = document.getElementById('giveUpButton');;
+
+
+
+
+
 
 // Create a lookup for capitals and their aliases
 const inputToCapital = {};
@@ -277,18 +290,66 @@ for (const alias in capitalAliases) {
   inputToCapital[normalize(alias)] = capitalAliases[alias];
 }
 
+
+
+// Tooltip setup
+const tooltip = document.createElement('div');
+tooltip.id = 'tooltip';
+document.body.appendChild(tooltip);
+
+document.querySelectorAll('[data-tooltip]').forEach(el => {
+  el.addEventListener('mouseenter', (e) => {
+    const text = e.target.getAttribute('data-tooltip');
+    tooltip.textContent = text;
+    tooltip.style.opacity = 1;
+    tooltip.style.left = e.pageX + 10 + 'px';
+    tooltip.style.top = e.pageY + 10 + 'px';
+  });
+
+  el.addEventListener('mousemove', (e) => {
+    tooltip.style.left = e.pageX + 10 + 'px';
+    tooltip.style.top = e.pageY + 10 + 'px';
+  });
+
+  el.addEventListener('mouseleave', () => {
+    tooltip.style.opacity = 0;
+  });
+});
+
+// ==== GAME STATES ====
+let isHardMode = false; // default
+let isGameOver = false;       // whether the game has ended (win)
+let isGiveUp = false;         // whether the player clicked "Give Up"
+
 // ==== DOMCONTENTLOADED ====
 
 let seconds = 0;
 let timerInterval = null;
 let timerElement = null; // declare globally
 
+
+
 document.addEventListener('DOMContentLoaded', () => {
-  
+
+
+  const hardModeToggle = document.getElementById('difficulty-toggle');
+
+  const toggle = document.getElementById('difficulty-toggle');
+  if (!toggle) return;
+
+  // Make sure global state is correct at start
+  syncHardMode();
+
+  // Listen for changes
+  toggle.addEventListener('change', () => {
+    syncHardMode();
+    console.log(isHardMode ? "Hard Mode ON" : "Hard Mode OFF");
+  });
+
   timerElement = document.getElementById('timer');
   startTimer();
   updateTimerDisplay();
-  
+
   const tablesContainer = document.getElementById('continent-tables');
   input = document.getElementById('answer');
 
@@ -304,55 +365,80 @@ document.addEventListener('DOMContentLoaded', () => {
   input.placeholder = 'Type a capital city';
   input.autocomplete = 'off';
 
-  // Auto-submit when user types a correct capital
+  updateUIForMode();
+
+  // ==== INPUT HANDLING ====
   input.addEventListener('input', () => {
-    const rawGuess = input.value.trim().toLowerCase();
-    if (inputToCapital[rawGuess] && !guessed.has(inputToCapital[rawGuess])) {
-      handleCapitalGuess(input.value);
-      input.value = '';
+    const rawGuess = input.value.trim();
+    const normalizedGuess = rawGuess.toLowerCase();
+    const officialCapital = inputToCapital[normalizedGuess];
+
+    // EASY MODE: accept any correct capital
+    if (!isHardMode) {
+      if (officialCapital && !guessed.has(officialCapital)) {
+        const shouldClear = handleCapitalGuess(rawGuess);
+        if (shouldClear) input.value = '';
+      }
+    }
+    // HARD MODE: only accept current country's capital
+    else {
+      if (
+        currentCountry &&
+        officialCapital === currentCountry.capital &&
+        !guessed.has(officialCapital)
+      ) {
+        const shouldClear = handleCapitalGuess(rawGuess);
+        if (shouldClear) input.value = '';
+      }
     }
   });
 
-  // Keep Enter key submission as fallback
+  // ==== ENTER KEY (fallback submission) ====
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter') {
-      handleCapitalGuess(input.value);
+      const rawGuess = input.value.trim();
+      const shouldClear = handleCapitalGuess(rawGuess);
       input.value = '';
+      flashInput(false);
+    }
+  });
+
+
+
+  // Show tooltip on hover
+  skipButton.addEventListener('mouseenter', showSkipTooltip);
+  skipButton.addEventListener('mousemove', showSkipTooltip);
+  skipButton.addEventListener('mouseleave', hideSkipTooltip);
+
+  // Pressing TAB triggers skip button if visible and enabled
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      e.preventDefault(); // prevent default tab behavior (focus change)
+      if (skipButton.style.display !== 'none' && !skipButton.disabled) {
+        skipButton.click();
+      }
     }
   });
 });
 
-// ==== GIVE UP BUTTON ====
-giveUpButton = document.getElementById('giveUpButton');
-
-if (giveUpButton) {
-  let giveUpConfirm = false;
-  giveUpButton.addEventListener('click', () => {
-    if (!giveUpConfirm && giveUpButton.textContent === "Give Up") {
-      giveUpButton.textContent = "Are you sure?";
-      giveUpConfirm = true;
-      setTimeout(() => {
-        if (giveUpButton.textContent === "Are you sure?") {
-          giveUpButton.textContent = "Give Up";
-          giveUpConfirm = false;
-        }
-      }, 3000);
-    } else if (giveUpConfirm && giveUpButton.textContent === "Are you sure?") {
-      revealRemainingCapitals();
-      pauseTimer();
-      input.disabled = true;
-      setTimerColor('giveup');
-      giveUpButton.textContent = "Play Again";
-      giveUpConfirm = false;
-    } else if (giveUpButton.textContent === "Play Again") {
-      resetGame();
-      giveUpButton.textContent = 'Give Up';
-      giveUpConfirm = false;
-    }
-  });
-}
+const skipTooltip = document.getElementById('skip-tooltip');
+const currentCountryEl = document.getElementById('current-country');
+const skipButton = document.getElementById('skip-button');
 
 
+// Handle skip button click
+skipButton.addEventListener('click', () => {
+  updateCurrentCountry();
+
+  // Clear input
+  input.value = '';
+  input.focus();
+});
+
+
+
+// Initial display
+updateCurrentCountry();
 
 // Updated populateCapitalTables function to accept container
 function populateCapitalTables(container) {
@@ -394,7 +480,8 @@ function populateCapitalTables(container) {
 
 
 
-
+// ==== GIVE UP BUTTON ====
+giveUpButton = document.getElementById('giveUpButton');
 
 let giveUpConfirm = false;
 
@@ -420,6 +507,10 @@ if (giveUpButton) {
 
     // Second click: confirm give up
     else if (giveUpConfirm && giveUpButton.textContent === "Are you sure?") {
+
+      isGiveUp = true;
+      updateCurrentCountry();
+
       // Reveal all remaining capitals
       revealRemainingCapitals(); // your existing function
 
@@ -427,6 +518,8 @@ if (giveUpButton) {
       pauseTimer();
       input.disabled = true;
       setTimerColor('giveup');
+      disableSkipButton();
+
 
       // Change button to "Play Again"
       giveUpButton.textContent = "Play Again";
@@ -443,13 +536,13 @@ if (giveUpButton) {
   });
 } else {
   console.warn('Give Up button not found - please add <button id="giveUpButton">Give Up</button> next to the timer.');
-} 
+}
 
 // PREGAME POPUP
 const pregameOverlay = document.getElementById('pregame-overlay');
 const startBtn = document.getElementById('start-game-btn');
 const answerInput = document.getElementById('answer');
-
+const pregameBackBtn = document.getElementById('pregame-back-btn');
 const pregameTitle = document.getElementById('pregame-title');
 const gameTitle = document.getElementById('game-title');
 
@@ -484,7 +577,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 if (startBtn && pregameOverlay) {
   startBtn.addEventListener('click', () => {
-    console.log("Game Started");
+    console.log("Game Started: ", isHardMode ? "Hard Mode" : "Easy Mode");
 
     if (answerInput) answerInput.focus();
 
@@ -492,29 +585,12 @@ if (startBtn && pregameOverlay) {
     document.body.style.overflow = '';
     document.documentElement.style.overflow = '';
     gameTitle.style.opacity = '1';
-    /* // Recalculate bounding boxes *after* layout settles
-    const preRect = pregameTitle.getBoundingClientRect();
-    const gameRect = gameTitle.getBoundingClientRect();
-
-    const translateX = gameRect.left - preRect.left;
-    const translateY = gameRect.top - preRect.top;
-    const scale = gameRect.width / preRect.width;
-
-    console.log("Recalculated translation:", translateX, translateY, scale);
-
-    // Start the animation
-    pregameTitle.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-
-    // Fade transition
-    setTimeout(() => {
-      pregameTitle.style.opacity = '0';
-      
-    }, 800); */
 
     // Overlay exit animation
     pregameOverlay.classList.add('exit');
     document.body.classList.add('game-started');
-    
+    pregameBackBtn.style.display = 'none'; // immediately removes it from layout
+
 
     const totalMs = Math.ceil((0.65 + (5 - 1) * 0.12) * 1000 + 80);
 
@@ -544,15 +620,14 @@ if (winBtn) {
     });
 
     // Update score, stop timer, and disable input
-    if (typeof updateScore === 'function') updateScore();
-    if (typeof pauseTimer === 'function') pauseTimer();
-    if (typeof input !== 'undefined' && input) input.disabled = true;
+    updateScore();
+    pauseTimer();
+    input.disabled = true;
 
     // Trigger the win popup
-    if (typeof triggerWinCondition === 'function') triggerWinCondition();
+    triggerWinCondition();
 
-    // Optional: give a quick green flash to confirm
-    if (typeof flashInput === 'function') flashInput(true);
+    
   });
 }
 
@@ -655,8 +730,12 @@ function revealRemainingCapitals() {
 // TRIGGER WIN CONDITION ALERT
 function triggerWinCondition() {
 
+  isGameOver = true;
+  updateCurrentCountry();
+
   pauseTimer(); // stop the timer
   setTimerColor('win');
+  disableSkipButton();
 
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
@@ -666,8 +745,15 @@ function triggerWinCondition() {
   // Get total capitals dynamically
   const totalCapitals = Object.values(easyModeData).flat().length;
 
+  // Calculate capitals per minute
+  const totalMinutes = seconds / 60 || 1; // avoid divide by zero
+  const rate = Math.round(totalCapitals / totalMinutes);
+
   // Update popup text
-  msg.textContent = `You named all ${totalCapitals} capital cities in ${mins}m ${secs}s!`;
+  msg.innerHTML = `
+    You named all ${totalCapitals} capital cities in ${mins}m ${secs}s!<br>
+    That's ${rate} capital cities per minute!
+  `;
 
   // Make popup visible
   popup.classList.remove('hidden');
@@ -784,7 +870,7 @@ function resetGame() {
   // 3. Reset input box
   input.value = '';
   input.disabled = false;
-  input.placeholder = 'Type a capital city';
+  updateUIForMode();
   input.focus();
   console.log("Input box reset");
 
@@ -804,13 +890,19 @@ function resetGame() {
   // 7. Reset any popups
   if (typeof resetWinPopup === 'function') resetWinPopup();
 
+  isGameOver = false;
+  isGiveUp = false;
+
+  // 8. Random new current country
+  updateCurrentCountry();
+  enableSkipButton();
 }
 
 
 
 // RESET TABLES
 function resetTables() {
-  for (const continent of Object.keys(continents)) {
+  for (const continent of Object.keys(continent)) {
     const table = document.getElementById(`table-${continent.toLowerCase().replace(/\s/g, '-')}`);
     if (!table) continue;
 
@@ -854,44 +946,184 @@ function handleCapitalGuess(rawInput) {
   const guess = normalize(rawInput);
   const officialCapital = inputToCapital[guess];
 
-  if (!officialCapital) {
-    flashInput(false); // wrong guess
-    return;
-  }
+  // HARD MODE: only accept the current country's capital
+  if (isHardMode) {
+    // If it doesn't match current country's capital, ignore completely
+    if (!currentCountry || officialCapital !== currentCountry.capital) {
+      return false; // don't clear input, no feedback
+    }
 
-  // Already guessed?
-  if (guessed.has(officialCapital)) {
-    flashInput(false);
-    return;
-  }
+    // Already guessed?
+    if (guessed.has(officialCapital)) {
+      return false; // don't clear input, no feedback
+    }
 
-  // Mark as guessed
-  guessed.add(officialCapital);
+    // CORRECT! Mark as guessed
+    guessed.add(officialCapital);
+    currentCountry.guessed = true;
 
-  // Reveal in the table
-  const cells = document.querySelectorAll(`td[data-capital='${officialCapital}']`);
-  cells.forEach(cell => {
-    cell.textContent = officialCapital;
-    cell.dataset.filled = 'true';
-    // Remove red 'give up' coloring if it exists
-    cell.classList.remove('revealed');
-  });
+    // Reveal capital in table
+    const cells = document.querySelectorAll(`td[data-capital='${officialCapital}']`);
+    cells.forEach(cell => {
+      cell.textContent = officialCapital;
+      cell.dataset.filled = 'true';
+      cell.classList.remove('revealed');
+    });
 
-  // Update score display
-  updateScore();
+    // Update score
+    updateScore();
 
-  // Flash green for correct
-  flashInput(true);
+    // Flash green for correct
+    flashInput(true);
 
-  // Clear input
-  input.value = '';
+    // Advance to next country
+    updateCurrentCountry();
 
-  // Check win condition
-  if (guessed.size === totalCapitals) {
-    triggerWinCondition();
+    // Check win condition
+    if (guessed.size === totalCapitals) {
+      triggerWinCondition();
+    }
+
+    return true; // clear input
+  } else {
+    // EASY MODE
+    // No match for guess
+    if (!officialCapital) {
+      flashInput(false);
+      return true; // clear input
+    }
+
+    // Already guessed?
+    if (guessed.has(officialCapital)) {
+      flashInput(false);
+      return true; // clear input
+    }
+
+    // Mark as guessed
+    guessed.add(officialCapital);
+
+    // Mark country as guessed
+    if (currentCountry) {
+      currentCountry.guessed = true;
+    }
+
+    // Reveal capital in table
+    const cells = document.querySelectorAll(`td[data-capital='${officialCapital}']`);
+    cells.forEach(cell => {
+      cell.textContent = officialCapital;
+      cell.dataset.filled = 'true';
+      cell.classList.remove('revealed');
+    });
+
+    // Update score
+    updateScore();
+
+    // Flash green for correct
+    flashInput(true);
+
+    // Check win condition
+    if (guessed.size === totalCapitals) {
+      triggerWinCondition();
+    }
+
+    return true; // clear input
   }
 }
 
+
 function normalize(str) {
   return str.toLowerCase();
+}
+
+// Update to a new current country
+function updateCurrentCountry() {
+  // Assuming you have some flags like isGameOver or isGiveUp
+  if (isGameOver || isGiveUp) {
+    currentCountry = null;
+    updateCountryDisplay(null); // blank display
+    return;
+  }
+
+  // Otherwise, pick a new unguessed country
+  currentCountry = pickRandomUnguessedCountry();
+  updateCountryDisplay(currentCountry);
+}
+
+// Pick a random unguessed country
+function pickRandomUnguessedCountry() {
+  const unguessedCountries = allCountries.filter(c => !c.guessed);
+  if (unguessedCountries.length === 0) return null;
+
+  const randomIndex = Math.floor(Math.random() * unguessedCountries.length);
+  return unguessedCountries[randomIndex];
+}
+
+// Update displayed country name
+function updateCountryDisplay(country) {
+  if (!country) {
+    currentCountryEl.textContent = '';
+    return;
+  }
+  currentCountryEl.textContent = country.country;
+}
+
+// ==== UPDATE UI FUNCTION ====
+function updateUIForMode() {
+  const skipButton = document.getElementById('skip-button');
+  const currentCountryEl = document.getElementById('current-country');
+  const input = document.getElementById('answer');
+
+  //syncHardMode();
+
+  if (isHardMode) {
+    skipButton.style.display = 'inline-block';
+    currentCountryEl.style.display = 'inline-block';
+    input.placeholder = "Type the capital city";
+
+  } else {
+    skipButton.style.display = 'none';
+    currentCountryEl.style.display = 'none';
+    input.placeholder = "Type a capital city";
+  }
+}
+
+
+
+function showSkipTooltip(e) {
+  skipTooltip.style.opacity = 1;
+  skipTooltip.style.left = `${e.pageX + 10}px`;
+  skipTooltip.style.top = `${e.pageY + 10}px`;
+}
+
+function hideSkipTooltip() {
+  skipTooltip.style.opacity = 0;
+}
+
+// Utility function to sync hard mode with toggle position
+function syncHardMode() {
+  const toggle = document.getElementById('difficulty-toggle');
+  if (!toggle) return false; // toggle not found
+  isHardMode = toggle.checked;
+  updateUIForMode(); // update UI based on current mode
+  return isHardMode;
+}
+
+// ==== DISABLE SKIP BUTTON ====
+function disableSkipButton() {
+  const skipButton = document.getElementById('skip-button');
+  if (skipButton) {
+    skipButton.disabled = true;
+    skipButton.style.opacity = '0.5';
+    skipButton.style.cursor = 'not-allowed';
+  }
+}
+
+// ==== ENABLE SKIP BUTTON ====
+function enableSkipButton() {
+  const skipButton = document.getElementById('skip-button');
+  if (skipButton) {
+    skipButton.disabled = false;
+    skipButton.style.opacity = '1';
+    skipButton.style.cursor = 'pointer';
+  }
 }

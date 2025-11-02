@@ -28,11 +28,25 @@
 
       <h2>How to Play</h2>
       <p>
-        Name all capital cities, as fast as you can.<br /><br />
+        Name all capital cities, as fast as you can.<br />
         For countries with multiple/unofficial capitals, just name one.
       </p>
 
-      <button id="start-game-btn">I'm ready!</button>
+      <div class="pregame-controls">
+
+        <button id="start-game-btn">I'm ready!</button>
+        <div class="difficulty-toggle">
+          <span class="difficulty-label" data-tooltip="Guess in any order">Easy</span>
+          <label class="switch">
+            <input type="checkbox" id="difficulty-toggle">
+            <span class="slider"></span>
+          </label>
+          <span class="difficulty-label" data-tooltip="Guess randomly, one at a time">Hard</span>
+        </div>
+
+
+      </div>
+
     </div>
 
   </div>
@@ -44,6 +58,10 @@
   <div id="game-header">
     <h1 id="game-title">Capital Cities</h1>
     <div id="input-container">
+      <button id="skip-button">Skip</button>
+      <div id="skip-tooltip">Click or press [TAB] to skip</div>
+      <p id="current-country">Placeholder</p>
+      
       <input type="text" id="answer" placeholder="Type a capital city">
       <span id="timer">00:00</span>
       <button id="giveUpButton">Give Up</button>
