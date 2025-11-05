@@ -11,24 +11,15 @@ body {
     color: white;
 }
 
-/* Bars (cover the whole viewport horizontally, stacked vertically) */
-.menu-bar {
-    position: absolute;
-    left: 0;
-    width: 100%;
-    /* slightly exceed to prevent horizontal gaps */
-    height: calc(100% / 5px);
-    /* ensures slight overlap to remove visible seams */
-    background: #2b2a33;
-    top: calc((var(--i) - 1) * 20%);
-    z-index: 30;
-    flex-direction: row;
-    font-family: inherit;
+/* overlay-content: make buttons inline and centered */
+.overlay-content {
     display: flex;
-    align-items: center;
-    gap: 60px;
-    /* space between buttons */
+    flex-direction: column;    /* stack vertically */
+    justify-content: center;    /* center vertically (optional) */
+    align-items: center;        /* center horizontally */
+    gap: 20px;                  /* space between buttons */
 }
+
 
 /* Shared button styling */
 .quiz-button {
@@ -120,3 +111,42 @@ p {
         /* reduce top/bottom margin */
     }
 }
+
+/* remove padding only for the hypnosis button */
+#hypnosis-button {
+    padding: 0;
+    width: 300px;
+    height: 92px;
+    border-radius: 8px;
+    background: white;
+}
+
+/* VIEWPORT MATCHING BUTTON SIZE */
+.image-viewport {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;         /* clip image inside viewport */
+}
+
+/* IMAGE INSIDE VIEWPORT */
+.image-button img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 415%;
+    height: 415%;
+    object-fit: cover;
+    transform-origin: center;
+    transform: translate(-50%, -50%) rotate(0deg); /* initial centering */
+    transition: transform 0.1s linear;
+}
+
+
+/* ROTATION ANIMATION */
+@keyframes rotate {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+

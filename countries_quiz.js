@@ -111,172 +111,6 @@ const svg = document.getElementById('world-map-svg');
 const guessed = new Set();
 score.textContent = `Countries Named:   0/${countries.length}`;
 
-/* // --- ZOOM + PAN FEATURE (Buffered Scroll + Auto-Center + Bounds Lock) ---
-
-let baseViewBox = svg.getAttribute("viewBox").split(" ").map(Number);
-let currentViewBox = [...baseViewBox];
-
-let zoomLevel = 1; // 1 = 100%
-const minZoom = 1;
-const maxZoom = 8;
-let targetZoom = zoomLevel; // For buffered zooming
-let zoomBuffer = 0; // Store scroll input
-
-let isAnimating = false;
-let isPanning = false;
-let startPoint = { x: 0, y: 0 };
-let startViewBox = [...baseViewBox];
-let dragThreshold = 3;
-let dragged = false;
-
-svg.style.cursor = "default";
-
-// --- Helper: Clamp panning so map never goes out of bounds ---
-function clampViewBox(vb) {
-  const [x, y, w, h] = vb;
-  const [bx, by, bw, bh] = baseViewBox;
-
-  // Limit boundaries — prevent showing outside base map
-  let clampedX = Math.min(Math.max(x, bx), bx + bw - w);
-  let clampedY = Math.min(Math.max(y, by), by + bh - h);
-
-  return [clampedX, clampedY, w, h];
-}
-
-// --- PANNING ---
-svg.addEventListener("mousedown", (e) => {
-  if (zoomLevel === 1 || isAnimating) return;
-  isPanning = true;
-  dragged = false;
-  startPoint = { x: e.clientX, y: e.clientY };
-  startViewBox = svg.getAttribute("viewBox").split(" ").map(Number);
-  svg.style.cursor = "grabbing";
-});
-
-svg.addEventListener("mousemove", (e) => {
-  if (!isPanning || zoomLevel === 1 || isAnimating) return;
-
-  const dx = e.clientX - startPoint.x;
-  const dy = e.clientY - startPoint.y;
-
-  if (Math.abs(dx) > dragThreshold || Math.abs(dy) > dragThreshold) dragged = true;
-
-  const rect = svg.getBoundingClientRect();
-  const scaleX = startViewBox[2] / rect.width;
-  const scaleY = startViewBox[3] / rect.height;
-
-  let newX = startViewBox[0] - dx * scaleX;
-  let newY = startViewBox[1] - dy * scaleY;
-
-  const clamped = clampViewBox([newX, newY, startViewBox[2], startViewBox[3]]);
-  svg.setAttribute("viewBox", clamped.join(" "));
-  currentViewBox = clamped;
-});
-
-["mouseup", "mouseleave"].forEach(evt => {
-  svg.addEventListener(evt, () => {
-    isPanning = false;
-    svg.style.cursor = zoomLevel > 1 ? "grab" : "default";
-  });
-});
-
-// --- BUFFERED SCROLL ZOOM ---
-let lastWheelTime = 0;
-
-svg.addEventListener("wheel", (e) => {
-  e.preventDefault();
-  const now = Date.now();
-
-  // Combine rapid scrolls into one smooth animation
-  if (now - lastWheelTime < 200) {
-    zoomBuffer += e.deltaY;
-  } else {
-    zoomBuffer = e.deltaY;
-  }
-  lastWheelTime = now;
-
-  if (!isAnimating) processZoomBuffer(e);
-}, { passive: false });
-
-function processZoomBuffer(e) {
-  if (zoomBuffer === 0) return;
-
-  const delta = zoomBuffer;
-  zoomBuffer = 0;
-
-  const zoomDirection = delta < 0 ? 1 : -1;
-  const zoomFactor = zoomDirection > 0 ? 1.5 : 1 / 1.5;
-
-  targetZoom = Math.min(maxZoom, Math.max(minZoom, zoomLevel * zoomFactor));
-  if (targetZoom === zoomLevel) return;
-
-  isAnimating = true;
-
-  const rect = svg.getBoundingClientRect();
-  // Mouse coords relative to current viewBox, not base
-  const [curX, curY, curW, curH] = currentViewBox;
-  const mouseX = curX + ((e.clientX - rect.left) / rect.width) * curW;
-  const mouseY = curY + ((e.clientY - rect.top) / rect.height) * curH;
-
-  const startViewBox = svg.getAttribute("viewBox").split(" ").map(Number);
-  let targetViewBox;
-
-  if (targetZoom === minZoom) {
-    // Zooming out fully → reset to centered base view
-    targetViewBox = [...baseViewBox];
-  } else {
-    const targetWidth = baseViewBox[2] / targetZoom;
-    const targetHeight = baseViewBox[3] / targetZoom;
-
-    const scale = zoomLevel / targetZoom;
-    const targetX = mouseX - (mouseX - startViewBox[0]) * scale;
-    const targetY = mouseY - (mouseY - startViewBox[1]) * scale;
-
-    targetViewBox = [targetX, targetY, targetWidth, targetHeight];
-  }
-
-  // Clamp before animating
-  targetViewBox = clampViewBox(targetViewBox);
-
-  const duration = 400;
-  const startTime = performance.now();
-
-  function animateZoom(now) {
-    const t = Math.min((now - startTime) / duration, 1);
-    const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-
-    const interpolated = startViewBox.map((start, i) =>
-      start + (targetViewBox[i] - start) * ease
-    );
-
-    const clamped = clampViewBox(interpolated);
-    svg.setAttribute("viewBox", clamped.join(" "));
-    currentViewBox = clamped;
-
-    if (t < 1) {
-      requestAnimationFrame(animateZoom);
-    } else {
-      zoomLevel = targetZoom;
-      currentViewBox = clampViewBox(targetViewBox);
-      isAnimating = false;
-      svg.style.cursor = zoomLevel > 1 ? "grab" : "default";
-
-      // Continue animating if more scroll buffered mid-animation
-      if (zoomBuffer !== 0) processZoomBuffer(e);
-    }
-  }
-
-  requestAnimationFrame(animateZoom);
-}
-// --- END ZOOM + PAN FEATURE --- */
-
-
-
-
-
-
-
-
 // Handle guesses as user types
 input.addEventListener('input', () => {
   const rawGuess = input.value.trim().toLowerCase();
@@ -548,7 +382,12 @@ if (winBtn) {
 
 // WIN POP-UP
 document.getElementById('play-again-btn').addEventListener('click', () => {
+  const popup = document.getElementById('win-popup');
+  popup.classList.add('hidden');
+  document.body.style.overflow = ''; // re-enable scrolling
+  document.documentElement.style.overflow = ''; // restore html scroll
   resetGame();
+
 });
 
 document.getElementById('close-popup-btn').addEventListener('click', () => {

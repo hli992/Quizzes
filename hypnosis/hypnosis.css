@@ -1,0 +1,82 @@
+body {
+  margin: 0;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+canvas {
+  display: block;
+}
+
+/* Controls container */
+#controls {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  display: flex;
+  gap: 5px;
+  z-index: 10;
+}
+
+/* Shared button styling for all buttons */
+#controls button,
+#fullscreenBtn,
+#exitBtn {
+  display: flex;                /* flexbox for centering */
+  justify-content: center;      /* center horizontally */
+  align-items: center;          /* center vertically */
+  text-align: center;           /* fallback text alignment */
+  line-height: 1;               /* remove extra spacing */
+  box-sizing: border-box;       /* include padding/border in width/height */
+  padding: 8px 12px;            /* standard padding */
+  width: 40px;
+  height: 38px;
+  font-size: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  border: 1px solid #555555;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #777777;
+  color: white;
+  text-decoration: none;        /* remove underline for links */
+  opacity: 0.5;
+  transition: background 0.2s, opacity 0.2s;;
+}
+
+/* Hover effect for all buttons */
+#controls button:hover,
+#fullscreenBtn:hover,
+#exitBtn:hover {
+  background: #444444;
+  opacity: 1;
+}
+
+/* Fullscreen button container */
+#fullscreenControl {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 10;
+}
+
+#exitBtn, #fullscreenBtn {
+  font-size: 25px;
+}
+
+#tooltip {
+    position: absolute;
+    pointer-events: none;
+    display: none;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    z-index: 1000;
+}
