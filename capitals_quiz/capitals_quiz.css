@@ -1,0 +1,598 @@
+/* Reset default margins */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  font-family: 'JetBrains Mono', monospace;
+  background: #2b2a33;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  overflow-x: hidden;
+  color: white;
+}
+
+/* Input styling */
+input#answer {
+  padding: 10px;
+  width: 250px;
+  max-width: 90%;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: background-color 0.5s ease;
+}
+
+#score {
+  font-weight: bold;
+  font-size: 22px;
+  margin-bottom: 15px;
+  white-space: pre;
+}
+
+#input-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  height: 40px;
+}
+
+#input-container input,
+#input-container button {
+  height: 100%;
+  box-sizing: border-box;
+  font-size: 16px;
+  font-family: inherit;
+}
+
+#input-container input {
+  padding: 0 10px;
+}
+
+#timer {
+  font-size: 1.5rem;
+  transition: color 0.3s ease;
+}
+
+#timer.win {
+  color: green;
+}
+
+#timer.giveup {
+  color: red;
+}
+
+#giveUpButton {
+  padding: 8px 12px;
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s ease, transform 0.2s ease;
+  width: 150px;
+  text-align: center;
+}
+
+#giveUpButton:hover {
+  background-color: #c9302c;
+  transform: scale(1.05);
+}
+
+#giveUpButton:active {
+  transform: scale(0.98);
+}
+
+/* Continent / capital tables */
+#continent-tables {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  max-width: 90vw;
+  margin: 0 auto;
+}
+
+.continent-section {
+  flex: 1 1 300px;
+}
+
+.continent-section table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.continent-section td,
+.continent-section th {
+  border: 1px solid #aaa;
+  padding: 4px 4px;
+  width: clamp(120px, 17vw, 400px);
+}
+
+.revealed {
+  color: red;
+}
+
+/* --- Fullscreen pregame overlay --- */
+.pregame-overlay {
+  position: fixed;
+  inset: 0;
+  background: #2b2a33;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 1s ease;
+  pointer-events: auto;
+}
+
+/* Overlay exit state */
+.pregame-overlay.exit {
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+/* Pregame content */
+.overlay-content {
+  position: absolute;
+  /* position it relative to viewport */
+  top: 30vh;
+  /* adjust vertical placement */
+  left: 10vw;
+  /* adjust horizontal placement */
+  width: 80vw;
+  /* fixed width */
+  height: 20vh;
+  /* fixed height */
+  text-align: left;
+  /* keep text left-aligned */
+  display: flex;
+  /* optional: use flex to align content inside */
+  flex-direction: column;
+  /* stack h2, p, etc. vertically */
+  justify-content: center;
+  /* vertically center text inside container */
+}
+
+
+/* Pregame title */
+#pregame-title {
+  position: fixed;
+  font-size: 4rem;
+  top: 10vh;
+  left: 12vw;
+  color: white;
+  z-index: 50;
+  text-align: left;
+  opacity: 0;
+  transition: opacity 2s ease, transform 0.8s ease, font-size 0.8s ease;
+  transform-origin: top left;
+
+  margin-bottom: 50px;
+}
+
+/* Headings and paragraphs inside overlay */
+.pregame-overlay h2,
+.pregame-overlay p,
+#pregame-back-btn,
+#pregame-overlay button {
+  opacity: 0;
+
+  transition: opacity 2s ease, transform 0.2s ease;
+}
+
+
+
+/* Back button */
+#pregame-back-btn {
+  position: fixed;
+  top: 10vh;
+  left: 6vw;
+  font-size: 4rem;
+  text-decoration: none;
+  color: white;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 2s ease, transform 0.2s ease;
+}
+
+#pregame-back-btn:hover {
+  transform: scale(1.05);
+}
+
+#pregame-overlay h2 {
+  font-size: 3rem;
+  margin-bottom: 10vh;
+  opacity: 0;
+}
+
+#pregame-overlay p {
+  font-size: 2rem;
+  margin-bottom: 10vh;
+  opacity: 0;
+}
+
+#start-game-btn {
+  padding: 12px 24px;
+  font-size: 1.5rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  font-family: 'JetBrains Mono', monospace;
+  width: 200px;
+}
+
+#start-game-btn:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+#start-game-btn:active {
+  transform: scale(0.98);
+}
+
+/* Accessibility: disable animations for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  .pregame-bar,
+  .popup-content.pregame {
+    transition: none !important;
+  }
+}
+
+/* Sticky header for game */
+#game-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #2b2a33;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+body {
+  padding-top: 180px;
+  /* adjust for header height */
+}
+
+
+/* Fade-in content when overlay shows */
+.pregame-overlay.show #pregame-title,
+.pregame-overlay.show #start-game-btn,
+.pregame-overlay.show #pregame-back-btn {
+  opacity: 1;
+
+}
+
+/* Initial hidden state */
+.pregame-overlay h2,
+.pregame-overlay p,
+#pregame-back-btn,
+#pregame-overlay button {
+  opacity: 0;
+
+  transition: opacity 2s ease, transform 0.2s ease;
+}
+
+#pregame-overlay.show #pregame-back-btn,
+#pregame-overlay.show h2,
+#pregame-overlay.show p,
+#pregame-overlay.show button {
+  opacity: 1;
+
+}
+
+
+/* Accessibility: disable animations for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  .pregame-bar,
+  .pregame-overlay * {
+    transition: none !important;
+  }
+}
+
+/* Make back button stick inside the header */
+#back-home-btn {
+  position: absolute;
+  top: 10vh;
+  left: 6vw;
+  font-size: 4rem;
+  color: white;
+  text-decoration: none;
+  z-index: 1001;
+  transition: transform 0.2s ease, opacity 1s ease;
+}
+
+#back-home-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Home button (top-left corner) */
+#pregame-back-btn {
+  position: fixed;
+  /* fix it relative to viewport */
+  top: 10vh;
+  left: 6vw;
+  font-size: 4rem;
+  text-decoration: none;
+  color: white;
+  z-index: 9999;
+  /* above everything */
+  opacity: 0;
+  /* hidden initially */
+  transition: opacity 2s ease;
+  /* smooth fade in */
+  pointer-events: auto;
+  /* make it clickable */
+}
+
+#pregame-back-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Slide up */
+body.game-started #back-home-btn {
+  transition: top 0.8s ease;
+  top: 1vh;
+  /* moves up to align with #game-title */
+}
+
+/* Instantly disappear when game starts */
+body.game-started #pregame-back-btn {
+  opacity: 0;
+  /* hidden immediately */
+  transition: none;
+  /* disable fade */
+}
+
+#game-title {
+  opacity: 0;
+  /* hidden until transition completes */
+  transition: none;
+  top: 10vh;
+  font-size: 3rem;
+}
+
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  overflow: hidden;
+  transform: translateY(0);
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.popup.hidden {
+  display: none;
+}
+
+.win-popup-content {
+  background-color: white;
+  padding: 25px 40px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  color: black;
+
+}
+
+.win-popup-content h2 {
+  margin-bottom: 16px;
+  color: black;
+  /* Adds space below the heading */
+}
+
+/* WIN POPUP BUTTONS */
+.win-popup-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.win-popup-content button {
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  min-width: 110px;
+  font-family: inherit;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.win-popup-content button:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+.win-popup-content button:active {
+  transform: scale(0.98);
+}
+
+
+.secondary-btn {
+  background-color: #777;
+  font-family: inherit;
+}
+
+.secondary-btn:hover {
+  background-color: #666;
+  font-family: inherit;
+}
+
+/* Difficulty toggle styling */
+.pregame-controls {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  gap: 20px;
+  /* space between toggle and button */
+  margin-top: 20px;
+}
+
+/* Initial hidden state for difficulty toggle */
+.difficulty-toggle {
+  opacity: 0;
+
+  transition: opacity 2s ease;
+}
+
+/* When overlay is shown, fade it in */
+.pregame-overlay.show .difficulty-toggle {
+  opacity: 1;
+
+}
+
+.difficulty-label {
+  font-weight: 500;
+  font-size: 16px;
+  cursor: default;
+}
+
+
+/* Switch base */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #4caf50;
+  transition: 0.3s;
+  border-radius: 26px;
+}
+
+.slider::before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked+.slider {
+  background-color: #c9302c;
+}
+
+input:checked+.slider::before {
+  transform: translateX(24px);
+}
+
+#tooltip,
+#skip-tooltip {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  /* 👈 remove fade-in delay */
+  z-index: 9999;
+}
+
+[data-tooltip] {
+  cursor: default;
+  /* keep normal arrow cursor */
+}
+
+#skip-button {
+  padding: 8px 12px;
+  background-color: #2b2b2b;
+  color: white;
+  border: 2px solid #444;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s ease, transform 0.2s ease;
+  width: 80px;
+  text-align: center;
+}
+
+#skip-button:hover {
+  background: #3c3c3c;
+
+  transform: scale(1.05);
+}
+
+#skip-button:active {
+  transform: scale(0.98);
+  background: #1e1e1e;
+}
+
+#skip-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+  transform: none;
+}
+
+#current-country {
+  font-size: 1rem;
+  padding: 8px 12px;
+  width: clamp(150px, 20vw, 350px);
+  height: 40px;
+  border: 2px solid #444;
+  border-radius: 6px;
+  white-space: nowrap;
+  /* prevents text from wrapping */
+  overflow: hidden;
+  /* optional: hides overflow if text is too long */
+  text-overflow: ellipsis;
+  /* optional: adds "..." for overflowing text */
+}

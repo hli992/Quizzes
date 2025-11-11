@@ -1,3 +1,5 @@
-/countries-quiz /countries_quiz.html    200
-/capitals-quiz  /capitals_quiz.html     200
-/ /quiz_homepage.html   200
+/countries-quiz /countries_quiz/countries_quiz.html 200
+/capitals-quiz /capitals_quiz/capitals_quiz.html 200
+/flags-quiz /country_flags_quiz/country_flags.html 200
+/hypnosis /hypnosis/hypnosis.html 200
+/ /homepage.html 200

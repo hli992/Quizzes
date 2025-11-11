@@ -1,0 +1,633 @@
+/* Reset default margins */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  font-family: 'JetBrains Mono', monospace;
+  background: #2b2a33;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  overflow-x: hidden;
+  color: white;
+}
+
+/* Input styling */
+input#answer {
+  padding: 10px;
+  width: 250px;
+  max-width: 90%;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: background-color 0.5s ease;
+}
+
+#score {
+  font-weight: bold;
+  font-size: 22px;
+  margin-bottom: 15px;
+  white-space: pre;
+}
+
+#input-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  height: 40px;
+}
+
+#input-container input,
+#input-container button {
+  height: 100%;
+  box-sizing: border-box;
+  font-size: 16px;
+  font-family: inherit;
+}
+
+#input-container input {
+  padding: 0 10px;
+}
+
+#timer {
+  font-size: 1.5rem;
+  transition: color 0.3s ease;
+}
+
+#timer.win {
+  color: green;
+}
+
+#timer.giveup {
+  color: red;
+}
+
+#giveUpButton {
+  padding: 8px 12px;
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s ease, transform 0.2s ease;
+  width: 150px;
+  text-align: center;
+}
+
+#giveUpButton:hover {
+  background-color: #c9302c;
+  transform: scale(1.05);
+}
+
+#giveUpButton:active {
+  transform: scale(0.98);
+}
+
+/* Continent / flag tables */
+#continent-tables {
+
+  justify-content: center;
+  gap: 1rem;
+  max-width: 95vw;
+  margin: 0 auto;
+}
+
+
+.continent-section h3 {
+  margin-bottom: 1rem;
+}
+
+
+
+.revealed {
+  color: red;
+}
+
+
+/* --- Fullscreen pregame overlay --- */
+.pregame-overlay {
+  position: fixed;
+  inset: 0;
+  background: #2b2a33;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 1s ease;
+  pointer-events: auto;
+}
+
+/* Overlay exit state */
+.pregame-overlay.exit {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Pregame content */
+.overlay-content {
+  position: absolute;
+  top: 30vh;
+  left: 10vw;
+  width: 80vw;
+  height: 20vh;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Pregame title */
+#pregame-title {
+  position: fixed;
+  font-size: 4rem;
+  top: 10vh;
+  left: 12vw;
+  color: white;
+  z-index: 50;
+  text-align: left;
+  opacity: 0;
+  transition: opacity 2s ease, transform 0.8s ease, font-size 0.8s ease;
+  transform-origin: top left;
+  margin-bottom: 50px;
+}
+
+/* Headings and paragraphs inside overlay */
+.pregame-overlay h2,
+.pregame-overlay p,
+#pregame-back-btn,
+#pregame-overlay button {
+  opacity: 0;
+  transition: opacity 2s ease, transform 0.2s ease;
+}
+
+/* Back button */
+#pregame-back-btn {
+  position: fixed;
+  top: 10vh;
+  left: 6vw;
+  font-size: 4rem;
+  text-decoration: none;
+  color: white;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 2s ease, transform 0.2s ease;
+}
+
+#pregame-back-btn:hover {
+  transform: scale(1.05);
+}
+
+#pregame-overlay h2 {
+  font-size: 3rem;
+  margin-bottom: 10vh;
+  opacity: 0;
+}
+
+#pregame-overlay p {
+  font-size: 2rem;
+  margin-bottom: 10vh;
+  opacity: 0;
+}
+
+#start-game-btn {
+  padding: 12px 24px;
+  font-size: 1.5rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  font-family: 'JetBrains Mono', monospace;
+  width: 200px;
+}
+
+#start-game-btn:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+#start-game-btn:active {
+  transform: scale(0.98);
+}
+
+/* Accessibility: disable animations for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  .pregame-bar,
+  .popup-content.pregame {
+    transition: none !important;
+  }
+}
+
+/* Sticky header for game */
+#game-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #2b2a33;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+body {
+  padding-top: 180px;
+}
+
+/* Fade-in content when overlay shows */
+.pregame-overlay.show #pregame-title,
+.pregame-overlay.show #start-game-btn,
+.pregame-overlay.show #pregame-back-btn {
+  opacity: 1;
+}
+
+/* Initial hidden state */
+.pregame-overlay h2,
+.pregame-overlay p,
+#pregame-back-btn,
+#pregame-overlay button {
+  opacity: 0;
+  transition: opacity 2s ease, transform 0.2s ease;
+}
+
+#pregame-overlay.show #pregame-back-btn,
+#pregame-overlay.show h2,
+#pregame-overlay.show p,
+#pregame-overlay.show button {
+  opacity: 1;
+}
+
+/* Accessibility: disable animations for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  .pregame-bar,
+  .pregame-overlay * {
+    transition: none !important;
+  }
+}
+
+/* Make back button stick inside the header */
+#back-home-btn {
+  position: fixed;
+  top: 10vh;
+  left: 6vw;
+  font-size: 4rem;
+  color: white;
+  text-decoration: none;
+  z-index: 1001;
+  transition: transform 0.2s ease, opacity 1s ease;
+}
+
+#back-home-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Home button (top-left corner) */
+#pregame-back-btn {
+  position: fixed;
+  top: 10vh;
+  left: 6vw;
+  font-size: 4rem;
+  text-decoration: none;
+  color: white;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 2s ease;
+  pointer-events: auto;
+}
+
+#pregame-back-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Slide up */
+body.game-started #back-home-btn {
+  transition: top 0.8s ease;
+  top: 1vh;
+}
+
+/* Instantly disappear when game starts */
+body.game-started #pregame-back-btn {
+  opacity: 0;
+  transition: none;
+}
+
+#game-title {
+  opacity: 0;
+  transition: none;
+  top: 10vh;
+  font-size: 3rem;
+}
+
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  overflow: hidden;
+  transform: translateY(0);
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.popup.hidden {
+  display: none;
+}
+
+.win-popup-content {
+  background-color: white;
+  padding: 25px 40px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  color: black;
+}
+
+.win-popup-content h2 {
+  margin-bottom: 16px;
+  color: black;
+}
+
+/* WIN POPUP BUTTONS */
+.win-popup-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.win-popup-content button {
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  min-width: 110px;
+  font-family: inherit;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.win-popup-content button:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+.win-popup-content button:active {
+  transform: scale(0.98);
+}
+
+.secondary-btn {
+  background-color: #777;
+  font-family: inherit;
+}
+
+.secondary-btn:hover {
+  background-color: #666;
+  font-family: inherit;
+}
+
+/* Pregame controls */
+.pregame-controls {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+#tooltip,
+#skip-tooltip {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 9999;
+}
+
+[data-tooltip] {
+  cursor: default;
+}
+
+#skip-button {
+  padding: 8px 12px;
+  background-color: #2b2b2b;
+  color: white;
+  border: 2px solid #444;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s ease, transform 0.2s ease;
+  width: 80px;
+  text-align: center;
+}
+
+#skip-button:hover {
+  background: #3c3c3c;
+  transform: scale(1.05);
+}
+
+#skip-button:active {
+  transform: scale(0.98);
+  background: #1e1e1e;
+}
+
+#skip-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+  transform: none;
+}
+
+#current-flag {
+  /* Set fixed container size */
+  height: 60px;
+  width: 100px;
+
+  /* CRUCIAL FIX: Scales the flag image to fit the fixed box 
+       while preserving its aspect ratio */
+  object-fit: contain;
+
+  /* Retained original styling */
+  border: 2px solid #444;
+  border-radius: 4px;
+
+  padding: 2px;
+
+  /* MODIFIED: Set the transition to 0.1s */
+  transition: opacity 0.1s ease-in-out;
+}
+
+/* NEW: Class used by JS to instantly hide the element */
+#current-flag.flag-fading-out {
+  opacity: 0;
+}
+
+/* New grid-based flag layout */
+#flags-table {
+  display: grid;
+  /* Ensure the grid uses all available width */
+  width: 90vw;
+  /* Columns will be 120px wide, and the 1fr allows them to expand and wrap */
+  grid-template-columns: repeat(auto-fit, 140px);
+  /* Column and row gap fixed at 20px */
+  gap: 20px;
+  justify-items: center;
+  padding: 10px;
+  box-sizing: border-box;
+  /* NEW: Ensures the columns remain centered when there is extra space */
+  justify-content: center;
+}
+
+.flag-pair {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #aaa;
+  padding: 8px;
+  background-color: #1f1f25;
+  border-radius: 6px;
+  width: 140px;
+  height: 130px;
+  box-sizing: border-box;
+  /* NEW: Add 0.2s transition for the background color change */
+  transition: background-color 0.2s ease;
+}
+
+/* Only apply hover effects and pointer cursor to UNGUESSED cells */
+.flag-pair:not(.answered):hover {
+  background-color: #333333;
+  /* Light grey on hover */
+  cursor: pointer;
+  /* Indicates the cell is clickable */
+}
+
+/* Removes pointer cursor for both correctly guessed and revealed cells */
+.flag-pair.answered {
+  cursor: default; 
+}
+
+/* Overrides the normal :hover effect for answered/revealed cells */
+.flag-pair.answered:hover {
+  /* Set background back to its non-hover default color */
+   
+  /* Reset any size change (like a transform scale) */
+  transform: none; 
+}
+
+/* Disable cursor and hover effects for all revealed cells */
+.flag-pair.revealed {
+  cursor: default; 
+}
+
+/* Overrides the normal :hover effect for revealed cells */
+.flag-pair.revealed:hover { 
+  /* Assuming #2b2b2b is your cell's default background color */
+  
+  /* Prevents any scale or transform effect on hover */
+  transform: none; 
+}
+
+.flag-pair img {
+  /* Fixed container size from previous step */
+  width: 100px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.country-label {
+  text-align: center;
+  font-size: 0.95rem;
+  color: white;
+
+  /* --- MODIFIED STYLES --- */
+
+  /* Remove white-space: nowrap to allow wrapping */
+  white-space: normal;
+  /* Allow word breaks for very long, single words */
+  word-wrap: break-word;
+  /* Remove overflow/ellipsis properties */
+  overflow: visible;
+  text-overflow: clip;
+
+  /* FIX: These two lines ensure the element reserves vertical space 
+         even when the content is an empty string ("") */
+  line-height: 1.2rem;
+  min-height: 1.2rem;
+}
+
+/* Color for labels revealed by the 'Give Up' button */
+.country-label.revealed {
+  color: red;
+}
+
+
+/* Styling for the enlarged flag tooltip */
+#flag-zoom-tooltip {
+  position: fixed;
+  /* Ensures it floats relative to the viewport */
+  background: #1f1f25;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 5px;
+  z-index: 10000;
+  /* Ensure it appears above everything else */
+
+  /* Fixed size for the enlarged view (Example: 200x120) */
+  width: 400px;
+  height: 200px;
+
+  /* Hidden by default, controls visibility transition */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;      
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
+#flag-zoom-tooltip img {
+  /* Scale the image to fit the larger container while preserving aspect ratio */
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Class to make the tooltip visible */
+#flag-zoom-tooltip.visible {
+  opacity: 1;
+}
