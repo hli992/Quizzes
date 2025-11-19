@@ -51,7 +51,7 @@ input#answer {
 #input-container button {
   height: 100%;
   box-sizing: border-box;
-  font-size: 16px;
+
   font-family: inherit;
 }
 
@@ -471,8 +471,8 @@ body.game-started #pregame-back-btn {
 
 #current-flag {
   /* Set fixed container size */
-  height: 60px;
-  width: 100px;
+  height: 70px;
+  width: 120px;
 
   /* CRUCIAL FIX: Scales the flag image to fit the fixed box 
        while preserving its aspect ratio */
@@ -535,28 +535,28 @@ body.game-started #pregame-back-btn {
 
 /* Removes pointer cursor for both correctly guessed and revealed cells */
 .flag-pair.answered {
-  cursor: default; 
+  cursor: default;
 }
 
 /* Overrides the normal :hover effect for answered/revealed cells */
 .flag-pair.answered:hover {
   /* Set background back to its non-hover default color */
-   
+
   /* Reset any size change (like a transform scale) */
-  transform: none; 
+  transform: none;
 }
 
 /* Disable cursor and hover effects for all revealed cells */
 .flag-pair.revealed {
-  cursor: default; 
+  cursor: default;
 }
 
 /* Overrides the normal :hover effect for revealed cells */
-.flag-pair.revealed:hover { 
+.flag-pair.revealed:hover {
   /* Assuming #2b2b2b is your cell's default background color */
-  
+
   /* Prevents any scale or transform effect on hover */
-  transform: none; 
+  transform: none;
 }
 
 .flag-pair img {
@@ -611,7 +611,7 @@ body.game-started #pregame-back-btn {
   /* Hidden by default, controls visibility transition */
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease;      
+  transition: opacity 0.2s ease;
 
   display: flex;
   align-items: center;
@@ -630,4 +630,210 @@ body.game-started #pregame-back-btn {
 /* Class to make the tooltip visible */
 #flag-zoom-tooltip.visible {
   opacity: 1;
+}
+
+/* --- MOBILE RESPONSIVENESS (Max Width 600px) --- */
+@media (max-width: 600px) {
+
+  html,
+  body {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* ============================== */
+  /* ## 🎮 PRE-GAME OVERLAY STYLES */
+  /* ============================== */
+
+  /* PARENT: Apply to the container of all pregame elements */
+  .pregame-overlay {
+    display: flex;
+    flex-direction: column;
+    /* NEW: Center all child items horizontally */
+    align-items: center;
+  }
+
+  /* Condense the main title */
+  #pregame-title {
+    font-size: 2.5rem;
+    /* Override fixed position for flex centering */
+    position: relative;
+    top: auto;
+    left: auto;
+    margin-bottom: 30px;
+    width: 90%;
+    text-align: center;
+  }
+
+  /* Re-center and simplify pregame overlay content (Container for text/button) */
+  .overlay-content {
+    top: 5vh;
+    left: 5vw;
+    width: 90vw;
+    height: auto;
+    /* Center text inside the content block */
+    text-align: center;
+    /* Corrected: Use 'center' to center its own flex children */
+    align-items: center;
+  }
+
+  /* Smaller headings/paragraphs */
+  #pregame-overlay h2 {
+    font-size: 2rem;
+    margin-bottom: 5vh;
+  }
+
+  #pregame-overlay p {
+    font-size: 1.2rem;
+    margin-bottom: 5vh;
+  }
+
+  /* Smaller start button */
+  #start-game-btn {
+    font-size: 1.2rem;
+    padding: 10px 20px;
+    width: 180px;
+  }
+
+  /* Smaller pregame back button */
+  #pregame-back-btn {
+    font-size: 2.5rem;
+    top: 5vh;
+    left: 5vw;
+  }
+
+  /* ============================ */
+  /* ## ⚙️ GAME LAYOUT & HEADER */
+  /* ============================ */
+
+  /* Condense the body padding to bring content closer to the header */
+  body {
+    padding-top: 130px;
+    /* Reduced from 180px */
+  }
+
+  /* Condense the fixed game header */
+  #game-header {
+
+    padding: 80px 0 10px;
+    /* Smaller padding top/bottom */
+  }
+
+  /* Reposition the home button to fit better in the condensed header */
+  #back-home-btn {
+    font-size: 2.5rem;
+    /* Smaller icon size */
+    top: 5px;
+    /* Move closer to the top */
+    left: 5vw;
+    /* Adjust from 6vw */
+  }
+
+  /* Simplify the title positioning in the header */
+  #game-title {
+    display: none;
+  }
+
+  #flags-table {
+    display: grid;
+    /* Ensure the grid uses all available width */
+    width: 95vw;
+    /* Columns will be 120px wide, and the 1fr allows them to expand and wrap */
+    grid-template-columns: repeat(auto-fit, 180px);
+    /* Column and row gap fixed at 10px */
+    gap: 10px;
+    justify-items: center;
+    padding: 40px 10px;
+    box-sizing: border-box;
+    /* NEW: Ensures the columns remain centered when there is extra space */
+    justify-content: center;
+    /* ADDED: Center the block horizontally */
+    margin: 0 auto;
+  }
+
+  .flag-pair {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #aaa;
+    padding: 8px;
+    background-color: #1f1f25;
+    border-radius: 6px;
+    width: 180px;
+    height: 150px;
+    box-sizing: border-box;
+    /* NEW: Add 0.2s transition for the background color change */
+    transition: background-color 0.2s ease;
+  }
+
+  .flag-pair img {
+    /* Fixed container size from previous step */
+    width: 170px;
+    height: 90px;
+    object-fit: contain;
+  }
+
+  /* ==================================== */
+  /* ## 🕹️ INPUTS, CONTROLS, & TOOLTIPS */
+  /* ==================================== */
+
+  /* Adjustments for the main input and controls container */
+  #input-container {
+    gap: 10px;
+    height: 35px;
+    /* Slightly smaller height */
+  }
+
+  /* Make the input take up more available space */
+  #input-container input#answer {
+    width: 150px;
+    font-size: 16px;
+    text-overflow: ellipsis;
+  }
+
+  /* Smaller 'Give Up' button */
+  #giveUpButton {
+    /* --- REVERTED TO STANDARD TEXT STYLING --- */
+    position: static;
+    /* Removed relative positioning */
+    width: 50px;
+    /* Reduced width for mobile */
+
+    padding: 0 10px;
+    /* Adjusted padding */
+    font-size: 0.6rem;
+    /* Set the desired small font size */
+    overflow: visible;
+    /* Removed hidden overflow */
+
+    white-space: normal;
+    /* Removed nowrap */
+    display: flex;
+    /* Using flex to center the text vertically */
+    justify-content: center;
+    align-items: center;
+    /* --- END REVERTED STYLING --- */
+  }
+
+  #timer {
+    font-size: 1rem;
+  }
+
+  #score {
+    font-size: 1rem;
+    margin-top: 10px;
+    margin-bottom: 5px;
+  }
+
+  /* Smaller 'Skip' button */
+  #skip-button {
+    display: none;
+  }
+
+  /* Smaller flag zoom tooltip */
+  #flag-zoom-tooltip {
+    width: 200px;
+    height: 120px;
+  }
 }

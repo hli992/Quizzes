@@ -415,18 +415,14 @@ function populateFlagTable(container) {
     const section = document.createElement('div');
     section.className = 'continent-section';
 
-    
-
-    // Create grid container instead of a table
     const grid = document.createElement('div');
     grid.id = 'flags-table';
 
-    // Loop through all countries and create flag–country pairs
     randomizedCountries.forEach(({ country, flag }) => {
         const pair = document.createElement('div');
         pair.className = 'flag-pair';
-
         pair.dataset.countryName = country;
+
         const flagImg = document.createElement('img');
         flagImg.src = flag;
         flagImg.alt = `${country} flag`;
@@ -435,16 +431,31 @@ function populateFlagTable(container) {
         const label = document.createElement('div');
         label.className = 'country-label';
         label.dataset.country = country;
-        label.dataset.filled = 'false';
-        label.textContent = ''; // initially empty
-        pair.appendChild(label);
 
+        const info = allCountries.find(c => c.country === country);
+
+        if (info && info.guessed) {
+            // Restore text
+            label.textContent = country;
+            label.classList.add('answered');
+            label.dataset.filled = 'true';
+
+            // CRUCIAL FIX: disable hover interaction on the entire cell
+            pair.classList.add('answered');
+        } else {
+            label.textContent = '';
+            label.dataset.filled = 'false';
+        }
+
+        pair.appendChild(label);
         grid.appendChild(pair);
     });
 
     section.appendChild(grid);
     container.appendChild(section);
 }
+
+
 
 // Re-render grid when window is resized
 window.addEventListener('resize', () => {

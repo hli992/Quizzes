@@ -51,7 +51,6 @@ input#answer {
 #input-container button {
   height: 100%;
   box-sizing: border-box;
-  font-size: 16px;
   font-family: inherit;
 }
 
@@ -318,7 +317,7 @@ body {
 
 /* Make back button stick inside the header */
 #back-home-btn {
-  position: absolute;
+  position: fixed;
   top: 10vh;
   left: 6vw;
   font-size: 4rem;
@@ -595,4 +594,276 @@ input:checked+.slider::before {
   /* optional: hides overflow if text is too long */
   text-overflow: ellipsis;
   /* optional: adds "..." for overflowing text */
+}
+
+/* --- MOBILE RESPONSIVENESS (Max Width 600px) --- */
+@media (max-width: 600px) {
+
+  html,
+  body {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* ============================== */
+  /* ## 🎮 PRE-GAME OVERLAY STYLES */
+  /* ============================== */
+
+  /* PARENT: Apply to the container of all pregame elements */
+  .pregame-overlay {
+    display: flex;
+    flex-direction: column;
+    /* NEW: Center all child items horizontally */
+    align-items: center;
+  }
+
+  /* Condense the main title */
+  #pregame-title {
+    font-size: 2.5rem;
+    /* Override fixed position for flex centering */
+    position: relative;
+    top: auto;
+    left: auto;
+    margin-bottom: 30px;
+    width: 90%;
+    text-align: center;
+  }
+
+  /* Re-center and simplify pregame overlay content (Container for text/button) */
+  .overlay-content {
+    top: 5vh;
+    left: 5vw;
+    width: 90vw;
+    height: auto;
+    /* Center text inside the content block */
+    text-align: center;
+    /* Corrected: Use 'center' to center its own flex children */
+    align-items: center;
+  }
+
+  /* Smaller headings/paragraphs */
+  #pregame-overlay h2 {
+    font-size: 2rem;
+    margin-bottom: 5vh;
+  }
+
+  #pregame-overlay p {
+    font-size: 1.2rem;
+    margin-bottom: 5vh;
+  }
+
+  /* Smaller start button */
+  #start-game-btn {
+    font-size: 1.2rem;
+    padding: 10px 20px;
+    width: 180px;
+  }
+
+  /* Smaller pregame back button */
+  #pregame-back-btn {
+    font-size: 2.5rem;
+    top: 5vh;
+    left: 5vw;
+  }
+
+  /* ============================== */
+  /* ## 📊 CONTINENT TABLES STYLES */
+  /* ============================== */
+
+  #continent-tables {
+    flex-direction: row;
+    /* Allow tables to sit next to each other */
+    flex-wrap: wrap;
+    /* NEW: Allow tables to wrap to the next line */
+    justify-content: center;
+    /* Center the table blocks */
+    gap: 0.5rem;
+    /* Reduced gap between tables */
+    flex-shrink: 1;
+    /* NEW: Allow the container to shrink */
+    width: 100%;
+    /* Ensure it takes full width to enable wrapping */
+    padding-top: 80px;
+  }
+
+  .continent-section {
+    /* Set width to ~45% to allow two tables side-by-side, plus gap */
+    width: 40%;
+    /* Remove the complex clamp calculation as it's not needed for mobile */
+    min-width: 100px;
+    max-width: 180px;
+
+    /* Ensure text alignment is preserved, though center is default */
+    text-align: center;
+    /* Reduce margin/padding if necessary, but the container gap should handle it */
+  }
+
+  .continent-section td {
+    padding: 4px;
+    /* Slightly reduced padding */
+    height: 20px;
+    /* Slightly reduced height */
+    font-size: 0.6rem;
+    /* Make text a bit smaller to fit */
+  }
+
+  /* ============================ */
+  /* ## ⚙️ GAME LAYOUT & HEADER */
+  /* ============================ */
+
+  /* Condense the body padding to bring content closer to the header */
+  body {
+    padding-top: 70px;
+    /* Reduced from 180px */
+  }
+
+  /* Condense the fixed game header */
+  #game-header {
+
+    padding: 20px 0 10px;
+    /* Smaller padding top/bottom */
+  }
+
+  #map-tooltip-container {
+    display: none
+  }
+
+  /* Reposition the home button to fit better in the condensed header */
+  #back-home-btn {
+
+    font-size: 2.5rem;
+    /* Smaller icon size */
+    top: 5px;
+    /* Move closer to the top */
+    left: 5vw;
+    /* Adjust from 6vw */
+  }
+
+  /* Simplify the title positioning in the header */
+  #game-title {
+    display: none;
+  }
+
+  /* ==================================== */
+  /* ## 🕹️ INPUTS, CONTROLS, & TOOLTIPS */
+  /* ==================================== */
+
+  #skip-tooltip {
+    display: none !important;
+  }
+
+  /* Switch to Grid to handle the 2-row layout cleanly */
+  #input-container {
+    display: grid;
+    /* Columns: Auto sizing for all three columns to minimize width */
+    grid-template-columns: auto auto auto;
+
+    /* Row 1: Skip Button | Current Country (spans 2 columns)
+       Row 2: Input       | Timer | Give Up Button 
+    */
+    grid-template-areas:
+      "skip country country country"
+      "input input timer giveup";
+
+    gap: 8px;
+    height: auto;
+    padding-bottom: 10px;
+
+    /* CHANGE: shrinking the container to the width of items */
+    width: 70vw;
+    /* Optional: Ensures it stays centered in the parent */
+    margin: 0 auto;
+  }
+
+  /* 1. Top Left: Skip Button */
+  #skip-button {
+    grid-area: skip;
+    width: 60px;
+    min-width: 60px;
+    /* Ensure clickable size */
+    height: 40px;
+    /* Match height of country box */
+    font-size: 0.8rem;
+    
+  }
+
+  /* 2. Top Right: Current Country Display */
+  #current-country {
+    grid-area: country;
+    width: 200px;
+    height: 40px;
+    margin: 0;
+    display: flex;
+
+    /* Center text vertically and horizontally */
+    align-items: center;
+    justify-content: center;
+
+    /* Slightly smaller font to help longer names fit */
+    font-size: 0.8rem;
+
+    /* --- CHANGE: Allow text to wrap instead of ellipsis --- */
+    white-space: normal;
+    /* Allows text to break onto new lines */
+    
+    /* Tight line height so 2 lines fit in 40px */
+    text-align: center;
+    /* Looks better for multi-line text */
+    overflow: hidden;
+    /* Ensures it doesn't spill out if 3 lines */
+    text-overflow: clip;
+    /* Removes the "..." */
+  }
+
+  /* 3. Bottom Left: Input Box */
+  #input-container input#answer {
+    grid-area: input;
+    width: 150px;
+    /* Fill the available bottom row space */
+    height: 40px;
+    font-size: 16px;
+    /* 16px prevents iOS from zooming in on focus */
+    text-overflow: ellipsis;
+  }
+
+  /* 4. Bottom Middle: Timer */
+  #timer {
+    grid-area: timer;
+    align-self: center;
+    justify-self: center;
+    font-size: 0.9rem;
+    margin: 0 5px;
+  }
+
+  /* 5. Bottom Right: Give Up Button */
+  #giveUpButton {
+    grid-area: giveup;
+    /* --- REVERTED TO STANDARD TEXT STYLING --- */
+    position: static;
+    /* Removed relative positioning */
+    width: 50px;
+    /* Reduced width for mobile */
+
+    padding: 0 10px;
+    /* Adjusted padding */
+    font-size: 0.6rem;
+    /* Set the desired small font size */
+    overflow: visible;
+    /* Removed hidden overflow */
+
+    white-space: normal;
+    /* Removed nowrap */
+    display: flex;
+    /* Using flex to center the text vertically */
+    justify-content: center;
+    align-items: center;
+    /* --- END REVERTED STYLING --- */
+  }
+
+  #score {
+    font-size: 1rem;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
 }

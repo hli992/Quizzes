@@ -3,3 +3,8 @@ netlify/functions/
 world.svg
 world - SS.svg
 kaleidoscope/
+# Local Netlify folder
+.netlify
+image_morph/
+particles/
+wind_tunnel/

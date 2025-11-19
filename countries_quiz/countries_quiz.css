@@ -54,7 +54,7 @@ input#answer {
 #input-container button {
   height: 100%;
   box-sizing: border-box;
-  font-size: 16px;
+
   font-family: inherit;
 }
 
@@ -646,4 +646,205 @@ body.game-started #pregame-back-btn {
 
 #map-tooltip-container:hover #map-tooltip-text {
   opacity: 0.75;
+}
+
+/* --- MOBILE RESPONSIVENESS (Max Width 600px) --- */
+@media (max-width: 600px) {
+
+  html,
+  body {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* ============================== */
+  /* ## 🎮 PRE-GAME OVERLAY STYLES */
+  /* ============================== */
+
+  /* PARENT: Apply to the container of all pregame elements */
+  .pregame-overlay {
+    display: flex;
+    flex-direction: column;
+    /* NEW: Center all child items horizontally */
+    align-items: center;
+  }
+
+  /* Condense the main title */
+  #pregame-title {
+    font-size: 2.5rem;
+    /* Override fixed position for flex centering */
+    position: relative;
+    top: auto;
+    left: auto;
+    margin-bottom: 30px;
+    width: 90%;
+    text-align: center;
+  }
+
+  /* Re-center and simplify pregame overlay content (Container for text/button) */
+  .overlay-content {
+    top: 5vh;
+    left: 5vw;
+    width: 90vw;
+    height: auto;
+    /* Center text inside the content block */
+    text-align: center;
+    /* Corrected: Use 'center' to center its own flex children */
+    align-items: center;
+  }
+
+  /* Smaller headings/paragraphs */
+  #pregame-overlay h2 {
+    font-size: 2rem;
+    margin-bottom: 5vh;
+  }
+
+  #pregame-overlay p {
+    font-size: 1.2rem;
+    margin-bottom: 5vh;
+  }
+
+  /* Smaller start button */
+  #start-game-btn {
+    font-size: 1.2rem;
+    padding: 10px 20px;
+    width: 180px;
+  }
+
+  /* Smaller pregame back button */
+  #pregame-back-btn {
+    font-size: 2.5rem;
+    top: 5vh;
+    left: 5vw;
+  }
+
+  /* ============================== */
+  /* ## 📊 CONTINENT TABLES STYLES */
+  /* ============================== */
+
+  #continent-tables {
+    flex-direction: row;
+    /* Allow tables to sit next to each other */
+    flex-wrap: wrap;
+    /* NEW: Allow tables to wrap to the next line */
+    justify-content: center;
+    /* Center the table blocks */
+    gap: 0.5rem;
+    /* Reduced gap between tables */
+    flex-shrink: 1;
+    /* NEW: Allow the container to shrink */
+    width: 100%;
+    /* Ensure it takes full width to enable wrapping */
+  }
+
+  .continent-section {
+    /* Set width to ~45% to allow two tables side-by-side, plus gap */
+    width: 45%;
+    /* Remove the complex clamp calculation as it's not needed for mobile */
+    min-width: 120px;
+    max-width: 200px;
+
+    /* Ensure text alignment is preserved, though center is default */
+    text-align: center;
+    /* Reduce margin/padding if necessary, but the container gap should handle it */
+  }
+
+  .continent-section td {
+    padding: 4px;
+    /* Slightly reduced padding */
+    height: 30px;
+    /* Slightly reduced height */
+    font-size: 0.8rem;
+    /* Make text a bit smaller to fit */
+  }
+
+  /* ============================ */
+  /* ## ⚙️ GAME LAYOUT & HEADER */
+  /* ============================ */
+
+  /* Condense the body padding to bring content closer to the header */
+  body {
+    padding-top: 70px;
+    /* Reduced from 180px */
+  }
+
+  /* Condense the fixed game header */
+  #game-header {
+
+    padding: 20px 0 10px;
+    /* Smaller padding top/bottom */
+  }
+
+  #map-tooltip-container {
+    display: none
+  }
+
+  /* Reposition the home button to fit better in the condensed header */
+  #back-home-btn {
+    font-size: 2.5rem;
+    /* Smaller icon size */
+    top: 5px;
+    /* Move closer to the top */
+    left: 5vw;
+    /* Adjust from 6vw */
+  }
+
+  /* Simplify the title positioning in the header */
+  #game-title {
+    display: none;
+  }
+
+  /* ==================================== */
+  /* ## 🕹️ INPUTS, CONTROLS, & TOOLTIPS */
+  /* ==================================== */
+
+  /* Adjustments for the main input and controls container */
+  #input-container {
+    gap: 10px;
+    height: 35px;
+    /* Slightly smaller height */
+  }
+
+  /* Make the input take up more available space */
+  #input-container input#answer {
+    width: 150px;
+    font-size: 16px;
+    text-overflow: ellipsis;
+  }
+
+  /* Smaller 'Give Up' button */
+  #giveUpButton {
+    /* --- REVERTED TO STANDARD TEXT STYLING --- */
+    position: static;
+    /* Removed relative positioning */
+    width: 50px;
+    /* Reduced width for mobile */
+
+    padding: 0 10px;
+    /* Adjusted padding */
+    font-size: 0.6rem;
+    /* Set the desired small font size */
+    overflow: visible;
+    /* Removed hidden overflow */
+
+    white-space: normal;
+    /* Removed nowrap */
+    display: flex;
+    /* Using flex to center the text vertically */
+    justify-content: center;
+    align-items: center;
+    /* --- END REVERTED STYLING --- */
+  }
+
+  #timer {
+    font-size: 1rem;
+  }
+
+  #score {
+    font-size: 1rem;
+    margin-top: 10px;
+    margin-bottom: 5px;
+  }
+
+
 }
