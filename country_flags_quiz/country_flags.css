@@ -739,7 +739,7 @@ body.game-started #pregame-back-btn {
     /* Ensure the grid uses all available width */
     width: 95vw;
     /* Columns will be 120px wide, and the 1fr allows them to expand and wrap */
-    grid-template-columns: repeat(auto-fit, 180px);
+    grid-template-columns: repeat(auto-fit, 160px);
     /* Column and row gap fixed at 10px */
     gap: 10px;
     justify-items: center;
@@ -760,8 +760,8 @@ body.game-started #pregame-back-btn {
     padding: 8px;
     background-color: #1f1f25;
     border-radius: 6px;
-    width: 180px;
-    height: 150px;
+    width: 160px;
+    height: 140px;
     box-sizing: border-box;
     /* NEW: Add 0.2s transition for the background color change */
     transition: background-color 0.2s ease;
@@ -769,7 +769,7 @@ body.game-started #pregame-back-btn {
 
   .flag-pair img {
     /* Fixed container size from previous step */
-    width: 170px;
+    width: 150px;
     height: 90px;
     object-fit: contain;
   }

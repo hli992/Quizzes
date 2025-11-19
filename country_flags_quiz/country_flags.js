@@ -434,15 +434,23 @@ function populateFlagTable(container) {
 
         const info = allCountries.find(c => c.country === country);
 
+        // 1. Case: User guessed it correctly
         if (info && info.guessed) {
-            // Restore text
             label.textContent = country;
-            label.classList.add('answered');
+            label.classList.add('answered'); // Adds green styling
             label.dataset.filled = 'true';
-
-            // CRUCIAL FIX: disable hover interaction on the entire cell
-            pair.classList.add('answered');
-        } else {
+            pair.classList.add('answered');  // Disables interaction
+        } 
+        // 2. Case: User gave up (Reveal missing answers)
+        else if (isGiveUp) {
+            label.textContent = country;
+            label.classList.add('revealed'); // Adds red styling
+            label.dataset.filled = 'true';
+            pair.classList.add('answered');  // Disables interaction
+            pair.classList.add('revealed');  // Visual cue for missed flag
+        } 
+        // 3. Case: Hidden
+        else {
             label.textContent = '';
             label.dataset.filled = 'false';
         }
@@ -822,6 +830,10 @@ function resetTimer() {
 
 // RESET GAME
 function resetGame() {
+    // 1. CRITICAL FIX: Reset state flags BEFORE rebuilding the table
+    isGameOver = false;
+    isGiveUp = false;
+
     guessed.clear();
 
     // Reset all country guessed flags
@@ -830,6 +842,8 @@ function resetGame() {
     // Create NEW random order for the table
     randomizedCountries = shuffleArray(allCountries);
     const tablesContainer = document.getElementById('continent-tables');
+    
+    // Now when this runs, isGiveUp is false, so labels will be hidden
     populateFlagTable(tablesContainer);
 
     // Reset input box
@@ -854,9 +868,6 @@ function resetGame() {
     const popup = document.getElementById('win-popup');
     if (popup) popup.classList.add('hidden');
 
-    isGameOver = false;
-    isGiveUp = false;
-
     // Pick new current country
     updateCurrentCountry();
     enableSkipButton();
@@ -879,14 +890,12 @@ function handleCountryGuess(rawInput) {
 
     // If it doesn't match current country's name, ignore
     if (!currentCountry || officialCountry !== currentCountry.country) {
-        // Flash red for incorrect/unmatched guess
         flashInput(false);
         return false;
     }
 
     // Already guessed?
     if (guessed.has(officialCountry)) {
-        // Flash yellow/green to show it was correct but already filled
         flashInput(true);
         return false;
     }
@@ -894,16 +903,14 @@ function handleCountryGuess(rawInput) {
     // CORRECT! Mark as guessed
     guessed.add(officialCountry);
     currentCountry.guessed = true;
+    
+    // This function updates the table visually (and safely handles the apostrophe)
     markCountryAsCompleted(currentCountry.country, false);
 
-    // Reveal country name in table/grid
-    // TARGET: the .country-label div using the data-country attribute
-    const labels = document.querySelectorAll(`.country-label[data-country='${officialCountry}']`);
-    labels.forEach(label => {
-        label.textContent = officialCountry;
-        label.dataset.filled = 'true';
-        label.classList.remove('revealed'); // Not strictly needed for the new structure, but safe to keep
-    });
+    /* --- DELETED THE CRASHING BLOCK HERE ---
+       The removed block used querySelectorAll(`.country-label[data-country='${officialCountry}']`)
+       which crashes on "Cote d'Ivoire" because of the single quote.
+    */
 
     // Update score
     updateScore();
@@ -1084,19 +1091,22 @@ function handleFlagClick(event) {
 
 // This function applies the '.answered' class to the flag cell
 function markCountryAsCompleted(countryName, isGivenUp) {
-    // 1. Find the flag-pair element in the grid
+    // 1. Find the flag-pair element using double quotes (safe for Cote d'Ivoire)
     const flagPair = document.querySelector(`.flag-pair[data-country-name="${countryName}"]`);
     if (!flagPair) return;
 
-    // 2. CRITICAL FIX: Add the .answered class to disable hover and click
+    // 2. Add the .answered class
     flagPair.classList.add('answered');
 
     // 3. Find the country-label element
     const label = flagPair.querySelector('.country-label');
 
     if (label) {
-        // Set the text to the country name
         label.textContent = countryName;
+        
+        // NEW: vital for game logic so "Give Up" doesn't overwrite this later
+        label.dataset.filled = 'true'; 
+        label.classList.remove('revealed'); 
 
         // Apply the appropriate color class
         if (isGivenUp) {
@@ -1108,10 +1118,9 @@ function markCountryAsCompleted(countryName, isGivenUp) {
         }
     }
 
-    // 4. Update the game data state (THIS IS THE KEY FIX)
+    // 4. Update the game data state
     const countryData = allCountries.find(c => c.country === countryName);
     if (countryData) {
-        // ONLY set 'guessed = true' if it was correctly guessed (i.e., NOT a give up)
         if (!isGivenUp) {
             countryData.guessed = true;
         }
